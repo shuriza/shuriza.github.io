@@ -1,0 +1,1 @@
+# shuriza.github.io
