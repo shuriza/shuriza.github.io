@@ -10,7 +10,7 @@ I build modern, performant, and user-friendly web applications.
 - 🔭 Currently working on **[Shuriza Store](https://shurizastore.my.id/)**
 - 🌱 Learning **Three.js, System Design**
 - 💬 Ask me about **React, Next.js, Laravel, TypeScript**
-- 📫 Reach me at **shuriza@email.com**
+- 📫 Reach me at **firdausmfirdaus657@gmail.com**
 
 ---
 
@@ -40,6 +40,6 @@ I build modern, performant, and user-friendly web applications.
 
 ### Links
 
-[![Portfolio](https://img.shields.io/badge/Portfolio-0a0a0f?style=for-the-badge&logo=vercel&logoColor=22d3ee)](https://shuriza.vercel.app)
+[![Portfolio](https://img.shields.io/badge/Portfolio-0a0a0f?style=for-the-badge&logo=vercel&logoColor=22d3ee)](https://portofolio-gilt-zeta-13.vercel.app)
 [![Shuriza Store](https://img.shields.io/badge/Shuriza_Store-0a0a0f?style=for-the-badge&logo=shopify&logoColor=22d3ee)](https://shurizastore.my.id/)
 [![GitHub](https://img.shields.io/badge/GitHub-0a0a0f?style=for-the-badge&logo=github&logoColor=white)](https://github.com/shuriza)
