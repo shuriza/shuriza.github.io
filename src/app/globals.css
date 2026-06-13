@@ -56,3 +56,124 @@ body {
   background: rgba(34, 211, 238, 0.3);
   color: #f1f5f9;
 }
+
+/* ============================================
+   Print styles for /cv page
+   ============================================ */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 14mm;
+  }
+
+  /* Reset background to paper-friendly */
+  html,
+  body,
+  .cv-root {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  /* Hide non-CV chrome */
+  .no-print,
+  nav,
+  footer {
+    display: none !important;
+  }
+
+  /* CV document — strip portfolio dark surface */
+  .cv-document {
+    background: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* Force exact colors so cyan accent stays visible */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Header */
+  .cv-header {
+    border-bottom: 1px solid #cbd5e1 !important;
+    padding-bottom: 16px !important;
+    page-break-after: avoid;
+  }
+
+  .cv-avatar {
+    background: #0891b2 !important;
+    color: #ffffff !important;
+  }
+
+  .cv-header h1 {
+    color: #0f172a !important;
+  }
+
+  .cv-contact,
+  .cv-contact * {
+    color: #334155 !important;
+  }
+
+  /* Sections */
+  .cv-section {
+    page-break-inside: avoid;
+    margin-top: 18px !important;
+  }
+
+  .cv-section-title,
+  .cv-section h2,
+  .cv-section h3 {
+    color: #0f172a !important;
+  }
+
+  .cv-section h2 > span:first-child {
+    background: #0891b2 !important;
+  }
+
+  /* Body text — force dark on white */
+  .cv-document p,
+  .cv-document li,
+  .cv-document span:not(.cv-badge) {
+    color: #1f2937 !important;
+  }
+
+  .cv-document h3 {
+    color: #0f172a !important;
+  }
+
+  /* Skill badges — solid borders, no transparent fills */
+  .cv-badge {
+    border: 1px solid #0891b2 !important;
+    background: transparent !important;
+    color: #0e7490 !important;
+  }
+
+  /* Project links shown as plain dark text */
+  .cv-links a {
+    color: #0e7490 !important;
+    text-decoration: none !important;
+  }
+
+  /* Tighten typography for paper */
+  .cv-document {
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+
+  .cv-document h1 {
+    font-size: 22pt;
+  }
+
+  .cv-document h2 {
+    font-size: 13pt;
+  }
+
+  .cv-document h3 {
+    font-size: 11pt;
+  }
+}

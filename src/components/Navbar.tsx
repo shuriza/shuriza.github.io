@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
+import Link from "next/link";
 
 const navLinks = [
-  { href: "#hero", label: "Home" },
-  { href: "#about", label: "About" },
-  { href: "#skills", label: "Skills" },
-  { href: "#projects", label: "Projects" },
+  { href: "/#hero", label: "Home" },
+  { href: "/#about", label: "About" },
+  { href: "/#skills", label: "Skills" },
+  { href: "/#projects", label: "Projects" },
+  { href: "/cv", label: "CV" },
 ];
 
 export default function Navbar() {
@@ -36,13 +38,14 @@ export default function Navbar() {
     >
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <motion.a
-          href="#hero"
-          className="text-xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
-          whileHover={{ scale: 1.05 }}
-        >
-          {"<Shuriza />"}
-        </motion.a>
+        <motion.div whileHover={{ scale: 1.05 }}>
+          <Link
+            href="/#hero"
+            className="text-xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
+          >
+            {"<Shuriza />"}
+          </Link>
+        </motion.div>
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8">
