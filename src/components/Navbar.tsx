@@ -10,6 +10,7 @@ const navLinks = [
   { href: "/#about", label: "About" },
   { href: "/#skills", label: "Skills" },
   { href: "/#projects", label: "Projects" },
+  { href: "/#contact", label: "Contact" },
   { href: "/cv", label: "CV" },
 ];
 
@@ -67,8 +68,10 @@ export default function Navbar() {
         {/* Mobile Toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="md:hidden text-slate-300 hover:text-cyan-400 transition-colors"
+          className="md:hidden text-slate-300 hover:text-cyan-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded"
           aria-label="Toggle menu"
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation"
         >
           {mobileOpen ? <HiX size={24} /> : <HiMenuAlt3 size={24} />}
         </button>
@@ -81,6 +84,7 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
+            id="mobile-navigation"
             className="md:hidden bg-[#0f172a]/95 backdrop-blur-md border-b border-[#334155]/50"
           >
             <div className="px-6 py-4 flex flex-col gap-4">

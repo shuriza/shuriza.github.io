@@ -8,14 +8,22 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Shuriza | Fullstack Web Developer",
+  title: "M. Firdaus Suryaningrat | Fullstack Web Developer",
   description:
-    "Portfolio of Shuriza — Fullstack Web Developer specializing in modern web applications with React, Next.js, Laravel, and more.",
-  keywords: ["fullstack", "web developer", "react", "next.js", "laravel", "portfolio"],
-  authors: [{ name: "Shuriza" }],
+    "Portfolio M. Firdaus Suryaningrat (Shuriza), fullstack web developer dari Kediri yang membangun aplikasi web modern dengan React, Next.js, dan Laravel.",
+  keywords: [
+    "M. Firdaus Suryaningrat",
+    "Shuriza",
+    "fullstack web developer",
+    "React",
+    "Next.js",
+    "Laravel",
+    "portfolio",
+  ],
+  authors: [{ name: "M. Firdaus Suryaningrat" }],
   openGraph: {
-    title: "Shuriza | Fullstack Web Developer",
-    description: "Building modern web applications",
+    title: "M. Firdaus Suryaningrat | Fullstack Web Developer",
+    description: "Membangun aplikasi web modern dari Kediri, Jawa Timur.",
     type: "website",
   },
 };
@@ -26,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="id" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#0a0a0f] text-slate-200">
         {children}
       </body>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import dynamic from "next/dynamic";
 
 const ParticleField = dynamic(() => import("@/components/3d/ParticleField"), {
@@ -53,13 +53,15 @@ function TypewriterText() {
 }
 
 export default function Hero() {
+  const prefersReducedMotion = useReducedMotion();
+
   return (
     <section
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       {/* 3D Background */}
-      <ParticleField />
+      {!prefersReducedMotion && <ParticleField />}
 
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-transparent to-[#0a0a0f] z-[1]" />
@@ -70,9 +72,9 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-sm md:text-base text-slate-400 mb-4 tracking-widest uppercase"
+          className="text-sm md:text-base text-slate-400 mb-4 tracking-[0.2em] uppercase"
         >
-          Hi, I&apos;m
+          M. Firdaus Suryaningrat / Shuriza
         </motion.p>
 
         <motion.h1
@@ -88,15 +90,25 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="text-lg md:text-xl text-slate-300 mb-6"
+          className="text-lg md:text-xl text-slate-300 mb-4"
         >
           Fullstack Web Developer
+        </motion.p>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="max-w-xl mx-auto text-base md:text-lg leading-relaxed text-slate-400 mb-6"
+        >
+          Saya membangun aplikasi web yang rapi, cepat, dan siap dipakai
+          menggunakan React, Next.js, dan Laravel.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
           className="text-base md:text-lg h-8 mb-10"
         >
           <TypewriterText />
@@ -105,20 +117,20 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.0 }}
+          transition={{ duration: 0.6, delay: 1.1 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <a
             href="#projects"
             className="px-8 py-3 bg-cyan-500 hover:bg-cyan-400 text-[#0a0a0f] font-semibold rounded-full transition-all duration-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)]"
           >
-            View Projects
+            Lihat Projects
           </a>
           <a
-            href="#about"
+            href="mailto:firdausmfirdaus657@gmail.com"
             className="px-8 py-3 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 rounded-full transition-all duration-300"
           >
-            About Me
+            Hubungi Saya
           </a>
         </motion.div>
       </div>
@@ -127,7 +139,7 @@ export default function Hero() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.5 }}
+        transition={{ delay: 1.6 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
       >
         <motion.div

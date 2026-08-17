@@ -5,7 +5,11 @@ import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 const socialLinks = [
   { href: "https://github.com/shuriza", icon: FaGithub, label: "GitHub" },
   { href: "https://linkedin.com/in/shuriza", icon: FaLinkedin, label: "LinkedIn" },
-  { href: "mailto:shuriza@email.com", icon: FaEnvelope, label: "Email" },
+  {
+    href: "mailto:firdausmfirdaus657@gmail.com",
+    icon: FaEnvelope,
+    label: "Email",
+  },
 ];
 
 export default function Footer() {
@@ -21,8 +25,8 @@ export default function Footer() {
             <a
               key={link.label}
               href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
+              target={link.href.startsWith("http") ? "_blank" : undefined}
+              rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
               className="text-slate-400 hover:text-cyan-400 transition-colors"
               aria-label={link.label}
             >
