@@ -3,19 +3,13 @@
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import dynamic from "next/dynamic";
+import type { Profile } from "@/lib/profile";
 
 const ParticleField = dynamic(() => import("@/components/3d/ParticleField"), {
   ssr: false,
 });
 
-const roles = [
-  "I build modern web apps",
-  "I craft clean & scalable code",
-  "I turn ideas into reality",
-  "I love React & Laravel",
-];
-
-function TypewriterText() {
+function TypewriterText({ roles }: { roles: string[] }) {
   const [currentRole, setCurrentRole] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,7 +36,7 @@ function TypewriterText() {
     }, timeout);
 
     return () => clearTimeout(timer);
-  }, [currentChar, isDeleting, currentRole]);
+  }, [currentChar, isDeleting, currentRole, roles]);
 
   return (
     <span className="text-cyan-400">
@@ -52,7 +46,7 @@ function TypewriterText() {
   );
 }
 
-export default function Hero() {
+export default function Hero({ profile }: { profile: Profile }) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -74,7 +68,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-sm md:text-base text-slate-400 mb-4 tracking-[0.2em] uppercase"
         >
-          M. Firdaus Suryaningrat / Shuriza
+          {profile.display_name} / {profile.short_name}
         </motion.p>
 
         <motion.h1
@@ -83,7 +77,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-5xl md:text-7xl font-bold text-white mb-4"
         >
-          Shuriza
+          {profile.short_name}
         </motion.h1>
 
         <motion.p
@@ -92,7 +86,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="text-lg md:text-xl text-slate-300 mb-4"
         >
-          Fullstack Web Developer
+          {profile.role}
         </motion.p>
 
         <motion.p
@@ -101,8 +95,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.7 }}
           className="max-w-xl mx-auto text-base md:text-lg leading-relaxed text-slate-400 mb-6"
         >
-          Saya membangun aplikasi web yang rapi, cepat, dan siap dipakai
-          menggunakan React, Next.js, dan Laravel.
+          {profile.hero_description}
         </motion.p>
 
         <motion.div
@@ -111,7 +104,7 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.9 }}
           className="text-base md:text-lg h-8 mb-10"
         >
-          <TypewriterText />
+          <TypewriterText roles={profile.hero_roles} />
         </motion.div>
 
         <motion.div
@@ -127,7 +120,7 @@ export default function Hero() {
             Lihat Projects
           </a>
           <a
-            href="mailto:firdausmfirdaus657@gmail.com"
+            href={`mailto:${profile.email}`}
             className="px-8 py-3 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 rounded-full transition-all duration-300"
           >
             Hubungi Saya

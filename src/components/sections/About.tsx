@@ -2,18 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import type { Profile } from "@/lib/profile";
 
-const terminalLines = [
-  { text: "const shuriza = {", delay: 0 },
-  { text: '  role: "Fullstack Web Developer",', delay: 0.5 },
-  { text: '  location: "Kediri, Jawa Timur",', delay: 1.0 },
-  { text: '  passion: "Building modern web apps",', delay: 1.5 },
-  { text: '  education: "Informatics Engineering",', delay: 2.0 },
-  { text: '  status: "Open to work"', delay: 2.5 },
-  { text: "};", delay: 3.0 },
-];
-
-function AnimatedTerminal() {
+function AnimatedTerminal({ terminalLines }: { terminalLines: { text: string; delay: number }[] }) {
   const [visibleLines, setVisibleLines] = useState(0);
   const [currentChars, setCurrentChars] = useState<number[]>(
     new Array(terminalLines.length).fill(0)
@@ -51,7 +42,7 @@ function AnimatedTerminal() {
     });
 
     return () => timers.forEach((t) => clearTimeout(t));
-  }, [isInView]);
+  }, [isInView, terminalLines]);
 
   return (
     <div ref={ref} className="bg-[#0d1117] rounded-lg border border-[#334155] overflow-hidden shadow-2xl">
@@ -92,9 +83,18 @@ function AnimatedTerminal() {
   );
 }
 
-export default function About() {
+export default function About({ profile }: { profile: Profile }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const terminalLines = [
+    { text: "const shuriza = {", delay: 0 },
+    { text: `  role: "${profile.role}",`, delay: 0.5 },
+    { text: `  location: "${profile.location}",`, delay: 1.0 },
+    { text: '  passion: "Building modern web apps",', delay: 1.5 },
+    { text: `  education: "${profile.education}",`, delay: 2.0 },
+    { text: `  status: "${profile.status}"`, delay: 2.5 },
+    { text: "};", delay: 3.0 },
+  ];
 
   return (
     <section id="about" className="py-24 px-6 relative">
@@ -128,7 +128,7 @@ export default function About() {
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.2 }}
           >
-            <AnimatedTerminal />
+            <AnimatedTerminal terminalLines={terminalLines} />
           </motion.div>
 
           {/* Bio - Right */}
@@ -139,22 +139,18 @@ export default function About() {
             className="space-y-6"
           >
             <p className="text-slate-300 leading-relaxed text-lg">
-              Halo! Saya Shuriza, seorang fullstack web developer dari Kediri,
-              Jawa Timur. Saya passionate dalam membangun aplikasi web modern
-              yang clean, performant, dan user-friendly.
+              {profile.bio_primary}
             </p>
             <p className="text-slate-400 leading-relaxed">
-              Dengan pengalaman di React, Next.js, Laravel, dan berbagai
-              teknologi web modern, saya selalu berusaha menciptakan solusi
-              digital yang memberikan dampak nyata.
+              {profile.bio_secondary}
             </p>
 
             <div className="grid grid-cols-2 gap-4 pt-4">
               {[
-                { label: "Location", value: "Kediri, Jawa Timur" },
-                { label: "Focus", value: "Fullstack Web" },
-                { label: "Education", value: "Informatics Eng." },
-                { label: "Status", value: "Open to work" },
+                { label: "Location", value: profile.location },
+                { label: "Focus", value: profile.focus },
+                { label: "Education", value: profile.education },
+                { label: "Status", value: profile.status },
               ].map((item, i) => (
                 <motion.div
                   key={item.label}

@@ -1,18 +1,14 @@
 "use client";
 
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
+import type { Profile } from "@/lib/profile";
 
-const socialLinks = [
-  { href: "https://github.com/shuriza", icon: FaGithub, label: "GitHub" },
-  { href: "https://linkedin.com/in/shuriza", icon: FaLinkedin, label: "LinkedIn" },
-  {
-    href: "mailto:firdausmfirdaus657@gmail.com",
-    icon: FaEnvelope,
-    label: "Email",
-  },
-];
-
-export default function Footer() {
+export default function Footer({ profile }: { profile: Profile }) {
+  const socialLinks = [
+    { href: profile.github, icon: FaGithub, label: "GitHub" },
+    { href: profile.linkedin, icon: FaLinkedin, label: "LinkedIn" },
+    { href: `mailto:${profile.email}`, icon: FaEnvelope, label: "Email" },
+  ];
   return (
     <footer className="border-t border-[#334155]/50 bg-[#0a0a0f]">
       <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">

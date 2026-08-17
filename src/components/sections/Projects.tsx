@@ -3,27 +3,7 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
-
-interface Project {
-  title: string;
-  description: string;
-  tech: string[];
-  github?: string;
-  demo?: string;
-  featured?: boolean;
-}
-
-const projects: Project[] = [
-  {
-    title: "Shuriza Store",
-    description:
-      "E-commerce platform with product catalog, shopping cart, and order management system.",
-    tech: ["Next.js", "React", "Tailwind CSS", "TypeScript"],
-    github: "https://github.com/shuriza/shuriza-store",
-    demo: "https://shurizastore.my.id/",
-    featured: true,
-  },
-];
+import type { Project } from "@/lib/projects";
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
   const ref = useRef(null);
@@ -100,7 +80,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
   );
 }
 
-export default function Projects() {
+export default function Projects({ projects }: { projects: Project[] }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -125,9 +105,15 @@ export default function Projects() {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {projects.map((project, index) => (
-            <ProjectCard key={project.title} project={project} index={index} />
-          ))}
+          {projects.length > 0 ? (
+            projects.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
+            ))
+          ) : (
+            <p className="md:col-span-2 text-center text-slate-400">
+              Project sedang diperbarui. Silakan kembali lagi nanti.
+            </p>
+          )}
         </div>
       </div>
     </section>

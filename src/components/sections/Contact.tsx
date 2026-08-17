@@ -3,8 +3,9 @@
 import { motion, useInView } from "framer-motion";
 import { FaEnvelope, FaFileAlt, FaGithub } from "react-icons/fa";
 import { useRef } from "react";
+import type { Profile } from "@/lib/profile";
 
-export default function Contact() {
+export default function Contact({ profile }: { profile: Profile }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -32,7 +33,7 @@ export default function Contact() {
 
         <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
           <a
-            href="mailto:firdausmfirdaus657@gmail.com"
+            href={`mailto:${profile.email}`}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-cyan-500 px-6 py-3 font-semibold text-[#0a0a0f] transition-all hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(34,211,238,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f172a] sm:w-auto"
           >
             <FaEnvelope size={15} />
@@ -46,7 +47,7 @@ export default function Contact() {
             Lihat CV
           </a>
           <a
-            href="https://github.com/shuriza"
+            href={profile.github}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-700 px-6 py-3 text-slate-300 transition-colors hover:border-cyan-500/40 hover:text-cyan-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f172a] sm:w-auto"

@@ -2,62 +2,19 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import {
-  SiReact,
-  SiNextdotjs,
-  SiTypescript,
-  SiTailwindcss,
-  SiLaravel,
-  SiPhp,
-  SiMysql,
-  SiSqlite,
-  SiGit,
-  SiDocker,
-  SiVercel,
-  SiNodedotjs,
-  SiFramer,
-  SiVite,
-} from "react-icons/si";
-import { TbApi } from "react-icons/tb";
-import { VscVscode } from "react-icons/vsc";
+import { SKILL_ICON_OPTIONS, type Skill } from "@/lib/skills";
 
-const skillCategories = [
-  {
-    title: "Frontend",
-    skills: [
-      { name: "React", icon: SiReact, color: "#61DAFB" },
-      { name: "Next.js", icon: SiNextdotjs, color: "#ffffff" },
-      { name: "TypeScript", icon: SiTypescript, color: "#3178C6" },
-      { name: "Tailwind CSS", icon: SiTailwindcss, color: "#06B6D4" },
-      { name: "Framer Motion", icon: SiFramer, color: "#0055FF" },
-      { name: "Vite", icon: SiVite, color: "#646CFF" },
-    ],
-  },
-  {
-    title: "Backend",
-    skills: [
-      { name: "Laravel", icon: SiLaravel, color: "#FF2D20" },
-      { name: "PHP", icon: SiPhp, color: "#777BB4" },
-      { name: "Node.js", icon: SiNodedotjs, color: "#339933" },
-      { name: "MySQL", icon: SiMysql, color: "#4479A1" },
-      { name: "SQLite", icon: SiSqlite, color: "#003B57" },
-      { name: "REST API", icon: TbApi, color: "#22d3ee" },
-    ],
-  },
-  {
-    title: "Tools",
-    skills: [
-      { name: "Git", icon: SiGit, color: "#F05032" },
-      { name: "Docker", icon: SiDocker, color: "#2496ED" },
-      { name: "Vercel", icon: SiVercel, color: "#ffffff" },
-      { name: "VS Code", icon: VscVscode, color: "#007ACC" },
-    ],
-  },
-];
+const categoryOrder = ["Frontend", "Backend", "Tools"] as const;
 
-export default function Skills() {
+export default function Skills({ skills }: { skills: Skill[] }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const skillCategories = categoryOrder
+    .map((title) => ({
+      title,
+      skills: skills.filter((skill) => skill.category === title),
+    }))
+    .filter((category) => category.skills.length > 0);
 
   return (
     <section id="skills" className="py-24 px-6 relative">
@@ -101,11 +58,14 @@ export default function Skills() {
                     }}
                     className="flex items-center gap-3 group/skill"
                   >
-                    <skill.icon
+                    {(() => {
+                      const Icon = SKILL_ICON_OPTIONS[skill.icon] ?? SKILL_ICON_OPTIONS.TbApi;
+                      return <Icon
                       size={20}
                       style={{ color: skill.color }}
                       className="shrink-0 group-hover/skill:scale-110 transition-transform"
-                    />
+                      />;
+                    })()}
                     <span className="text-sm text-slate-300 group-hover/skill:text-white transition-colors">
                       {skill.name}
                     </span>

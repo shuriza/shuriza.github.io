@@ -45,6 +45,30 @@ Open [http://localhost:3000](http://localhost:3000)
 npm run build
 ```
 
+## Admin Project CRUD
+
+Dashboard admin tersedia di `/admin/login` dan menggunakan Supabase Auth dengan
+email/password. Data project, skills, dan profile disimpan di Supabase PostgreSQL,
+bukan di browser.
+
+1. Buat project di [Supabase](https://supabase.com/), lalu buka SQL Editor.
+2. Jalankan isi file `supabase/schema.sql` untuk membuat tabel, RLS policy, dan seed project, skills, serta profile. Jika schema lama sudah pernah dijalankan, cukup jalankan `supabase/upgrade.sql`.
+3. Buat user admin di Supabase Dashboard melalui **Authentication > Users > Add user**.
+4. Jalankan query terakhir di `supabase/schema.sql` dengan UUID user tersebut agar akun punya akses admin.
+5. Salin `.env.example` menjadi `.env.local`, lalu isi URL dan anon key dari **Project Settings > API**.
+6. Jalankan `npm run dev`, kemudian buka `http://localhost:3000/admin/login`.
+
+Environment yang dibutuhkan:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Saat environment Supabase belum diisi, halaman publik tetap menampilkan seed
+`Shuriza Store` sebagai fallback. CRUD admin baru aktif setelah konfigurasi
+Supabase selesai.
+
 ## License
 
 MIT
