@@ -7,6 +7,8 @@ export async function getPublishedSkills(): Promise<Skill[]> {
   }
 
   const supabase = await createSupabaseServerClient();
+  if (!supabase) return fallbackSkills;
+
   const { data, error } = await supabase
     .from("skills")
     .select("id, name, category, icon, color, published, sort_order")

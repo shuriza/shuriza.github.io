@@ -33,6 +33,8 @@ export async function getPublishedProjects(): Promise<Project[]> {
   }
 
   const supabase = await createSupabaseServerClient();
+  if (!supabase) return fallbackProjects;
+
   const { data, error } = await supabase
     .from("projects")
     .select("id, title, description, tech, github, demo, featured, published, sort_order")

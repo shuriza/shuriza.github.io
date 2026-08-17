@@ -3,6 +3,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function requireAdmin() {
   const supabase = await createSupabaseServerClient();
+
+  if (!supabase) redirect("/admin/login?error=setup");
+
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -13,7 +13,9 @@ function LoginForm() {
   const [error, setError] = useState(
     searchParams.get("error") === "unauthorized"
       ? "Akun ini belum terdaftar sebagai admin."
-      : ""
+      : searchParams.get("error") === "setup"
+        ? "Konfigurasi Supabase belum lengkap. Tambahkan environment variable di Vercel."
+        : ""
   );
   const [loading, setLoading] = useState(false);
 
@@ -22,7 +24,15 @@ function LoginForm() {
     setLoading(true);
     setError("");
 
-    const supabase = createSupabaseBrowserClient();
+    let supabase;
+    try {
+      supabase = createSupabaseBrowserClient();
+    } catch {
+      setError("Konfigurasi Supabase belum lengkap. Tambahkan environment variable di Vercel.");
+      setLoading(false);
+      return;
+    }
+
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,

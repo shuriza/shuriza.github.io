@@ -52,6 +52,8 @@ export async function getProfile(): Promise<Profile> {
   }
 
   const supabase = await createSupabaseServerClient();
+  if (!supabase) return fallbackProfile;
+
   const { data, error } = await supabase.from("profile").select("*").eq("id", 1).maybeSingle();
 
   if (error || !data) {
