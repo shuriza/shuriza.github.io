@@ -46,7 +46,13 @@ function TypewriterText({ roles }: { roles: string[] }) {
   );
 }
 
-export default function Hero({ profile }: { profile: Profile }) {
+export default function Hero({
+  profile,
+  showParticles = true,
+}: {
+  profile: Profile;
+  showParticles?: boolean;
+}) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -55,7 +61,7 @@ export default function Hero({ profile }: { profile: Profile }) {
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
     >
       {/* 3D Background */}
-      {!prefersReducedMotion && <ParticleField />}
+      {showParticles && !prefersReducedMotion && <ParticleField />}
 
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-transparent to-[#0a0a0f] z-[1]" />

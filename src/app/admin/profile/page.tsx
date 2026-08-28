@@ -1,4 +1,4 @@
-import Link from "next/link";
+import AdminNav from "@/app/admin/AdminNav";
 import { updateProfile } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
 import { fallbackProfile, getProfile } from "@/lib/profile";
@@ -20,10 +20,7 @@ export default async function AdminProfilePage({
             <h1 className="text-3xl font-bold text-white">Profile settings</h1>
             <p className="mt-2 text-sm text-slate-400">Login sebagai {user.email}</p>
           </div>
-          <nav className="flex flex-wrap gap-3 text-sm">
-            <Link href="/admin/projects" className="rounded-lg border border-[#475569] px-4 py-2 text-slate-300 hover:border-cyan-400 hover:text-cyan-300">Projects</Link>
-            <Link href="/admin/skills" className="rounded-lg border border-[#475569] px-4 py-2 text-slate-300 hover:border-cyan-400 hover:text-cyan-300">Skills</Link>
-          </nav>
+          <AdminNav active="/admin/profile" />
         </header>
 
         {params.saved && <p className="mb-5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">Profile berhasil disimpan.</p>}
@@ -62,6 +59,20 @@ export default async function AdminProfilePage({
                 <label className="block text-sm text-slate-300">GitHub URL<input name="github" type="url" required defaultValue={profile.github || fallbackProfile.github} className="admin-input" /></label>
                 <label className="block text-sm text-slate-300">LinkedIn URL<input name="linkedin" type="url" required defaultValue={profile.linkedin || fallbackProfile.linkedin} className="admin-input" /></label>
               </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="mb-2 text-lg font-semibold text-white">Halaman CV</h2>
+            <p className="mb-5 text-sm text-slate-400">
+              Isi bagian ini untuk halaman <code>/cv</code>. Skill dan project di CV diambil
+              otomatis dari menu Skills dan Projects.
+            </p>
+            <div className="space-y-5">
+              <label className="block text-sm text-slate-300">Headline CV<input name="cv_headline" required defaultValue={profile.cv_headline || fallbackProfile.cv_headline} className="admin-input" /></label>
+              <label className="block text-sm text-slate-300">Ringkasan CV<textarea name="cv_summary" required rows={4} defaultValue={profile.cv_summary || fallbackProfile.cv_summary} className="admin-input resize-y" /></label>
+              <label className="block text-sm text-slate-300">Soft skills <span className="text-slate-500">(satu per baris)</span><textarea name="soft_skills" rows={4} defaultValue={profile.soft_skills.join("\n")} className="admin-input resize-y" /></label>
+              <label className="block text-sm text-slate-300">Bahasa <span className="text-slate-500">(satu per baris, format: Nama | Level)</span><textarea name="languages" rows={3} defaultValue={profile.languages.map((language) => `${language.name} | ${language.level}`).join("\n")} className="admin-input resize-y" /></label>
             </div>
           </section>
 

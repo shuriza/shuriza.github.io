@@ -31,6 +31,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Animasi reveal (translateX ±50px) menggeser elemen keluar viewport sebelum
+   terlihat; clip mencegah halaman bisa digeser horizontal di mobile. */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -154,10 +161,24 @@ body {
     color: #334155 !important;
   }
 
-  /* Sections */
+  /* overflow clip global mengganggu fragmentasi halaman saat print */
+  html,
+  body {
+    overflow-x: visible;
+  }
+
+  /* Sections boleh pecah antar halaman; yang dijaga utuh adalah item di
+     dalamnya (.cv-item) supaya tidak ada gap besar akibat section panjang. */
   .cv-section {
-    page-break-inside: avoid;
     margin-top: 18px !important;
+  }
+
+  .cv-section-title {
+    break-after: avoid;
+  }
+
+  .cv-item {
+    break-inside: avoid;
   }
 
   .cv-section-title,

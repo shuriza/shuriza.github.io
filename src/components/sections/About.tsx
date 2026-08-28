@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import type { Profile } from "@/lib/profile";
+import { useReveal } from "@/components/useReveal";
 
 function AnimatedTerminal({ terminalLines }: { terminalLines: { text: string; delay: number }[] }) {
   const [visibleLines, setVisibleLines] = useState(0);
   const [currentChars, setCurrentChars] = useState<number[]>(
     new Array(terminalLines.length).fill(0)
   );
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useReveal(ref);
 
   useEffect(() => {
     if (!isInView) return;
@@ -84,8 +85,8 @@ function AnimatedTerminal({ terminalLines }: { terminalLines: { text: string; de
 }
 
 export default function About({ profile }: { profile: Profile }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useReveal(ref);
   const terminalLines = [
     { text: "const shuriza = {", delay: 0 },
     { text: `  role: "${profile.role}",`, delay: 0.5 },

@@ -1,13 +1,20 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { FaEnvelope, FaFileAlt, FaGithub } from "react-icons/fa";
 import { useRef } from "react";
 import type { Profile } from "@/lib/profile";
+import { useReveal } from "@/components/useReveal";
 
-export default function Contact({ profile }: { profile: Profile }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+export default function Contact({
+  profile,
+  showCvLink = true,
+}: {
+  profile: Profile;
+  showCvLink?: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useReveal(ref);
 
   return (
     <section id="contact" className="px-6 py-24 relative">
@@ -27,7 +34,7 @@ export default function Contact({ profile }: { profile: Profile }) {
           Punya ide atau peluang kolaborasi?
         </h2>
         <p className="mx-auto mb-8 max-w-2xl leading-relaxed text-slate-400">
-          Saya terbuka untuk magang, freelance, dan kolaborasi pengembangan web.
+          Saya terbuka untuk proyek freelance, kontrak, dan peluang full-time.
           Ceritakan kebutuhanmu, lalu kita cari solusi yang paling tepat.
         </p>
 
@@ -39,13 +46,15 @@ export default function Contact({ profile }: { profile: Profile }) {
             <FaEnvelope size={15} />
             Kirim Email
           </a>
-          <a
-            href="/cv"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-cyan-500/40 px-6 py-3 text-cyan-300 transition-colors hover:bg-cyan-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f172a] sm:w-auto"
-          >
-            <FaFileAlt size={15} />
-            Lihat CV
-          </a>
+          {showCvLink && (
+            <a
+              href="/cv"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-cyan-500/40 px-6 py-3 text-cyan-300 transition-colors hover:bg-cyan-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f172a] sm:w-auto"
+            >
+              <FaFileAlt size={15} />
+              Lihat CV
+            </a>
+          )}
           <a
             href={profile.github}
             target="_blank"

@@ -4,19 +4,24 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenuAlt3, HiX } from "react-icons/hi";
 import Link from "next/link";
+import { fallbackSettings, type SiteSettings } from "@/lib/settings";
 
-const navLinks = [
-  { href: "/#hero", label: "Home" },
-  { href: "/#about", label: "About" },
-  { href: "/#skills", label: "Skills" },
-  { href: "/#projects", label: "Projects" },
-  { href: "/#contact", label: "Contact" },
-  { href: "/cv", label: "CV" },
-];
+/** `flag: null` berarti link selalu tampil. */
+const NAV_ITEMS = [
+  { href: "/#hero", label: "Home", flag: null },
+  { href: "/#about", label: "About", flag: "about_enabled" },
+  { href: "/#skills", label: "Skills", flag: "skills_enabled" },
+  { href: "/#projects", label: "Projects", flag: "projects_enabled" },
+  { href: "/#contact", label: "Contact", flag: "contact_enabled" },
+  { href: "/cv", label: "CV", flag: "cv_enabled" },
+] as const;
 
-export default function Navbar() {
+export default function Navbar({ settings = fallbackSettings }: { settings?: SiteSettings }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navLinks = NAV_ITEMS.filter((item) => item.flag === null || settings[item.flag]);
+  const showAdminLink = settings.admin_link_enabled;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,15 +68,17 @@ export default function Navbar() {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-400 transition-all duration-300 group-hover:w-full" />
             </motion.a>
           ))}
-          <motion.a
-            href="/admin/login"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 * navLinks.length, duration: 0.4 }}
-            className="px-5 py-2 rounded-full bg-cyan-500 hover:bg-cyan-400 text-[#0a0a0f] text-sm font-semibold transition-all duration-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)]"
-          >
-            Login
-          </motion.a>
+          {showAdminLink && (
+            <motion.a
+              href="/admin/login"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 * navLinks.length, duration: 0.4 }}
+              className="px-5 py-2 rounded-full bg-cyan-500 hover:bg-cyan-400 text-[#0a0a0f] text-sm font-semibold transition-all duration-300 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)]"
+            >
+              Login
+            </motion.a>
+          )}
         </div>
 
         {/* Mobile Toggle */}
@@ -107,13 +114,15 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
-              <a
-                href="/admin/login"
-                onClick={() => setMobileOpen(false)}
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-cyan-500 text-[#0a0a0f] font-semibold transition-colors hover:bg-cyan-400"
-              >
-                Login
-              </a>
+              {showAdminLink && (
+                <a
+                  href="/admin/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-cyan-500 text-[#0a0a0f] font-semibold transition-colors hover:bg-cyan-400"
+                >
+                  Login
+                </a>
+              )}
             </div>
           </motion.div>
         )}

@@ -48,8 +48,8 @@ npm run build
 ## Admin Project CRUD
 
 Dashboard admin tersedia di `/admin/login` dan menggunakan Supabase Auth dengan
-email/password. Data project, skills, dan profile disimpan di Supabase PostgreSQL,
-bukan di browser.
+email/password. Data project, skills, profile, halaman CV, dan pengaturan fitur
+disimpan di Supabase PostgreSQL, bukan di browser.
 
 1. Buat project di [Supabase](https://supabase.com/), lalu buka SQL Editor.
 2. Jalankan isi file `supabase/schema.sql` untuk membuat tabel, RLS policy, dan seed project, skills, serta profile. Jika schema lama sudah pernah dijalankan, cukup jalankan `supabase/upgrade.sql`.
@@ -57,6 +57,38 @@ bukan di browser.
 4. Jalankan query terakhir di `supabase/schema.sql` dengan UUID user tersebut agar akun punya akses admin.
 5. Salin `.env.example` menjadi `.env.local`, lalu isi URL dan anon key dari **Project Settings > API**.
 6. Jalankan `npm run dev`, kemudian buka `http://localhost:3000/admin/login`.
+
+Menu dashboard:
+
+| Menu | Fungsi |
+|------|--------|
+| Projects | CRUD project yang tampil di halaman utama dan CV |
+| Skills | CRUD skill per kategori (Frontend/Backend/Tools) |
+| Profile | Identitas, bio, hero, kontak, dan konten halaman CV |
+| Settings | Menyembunyikan/menampilkan fitur situs |
+
+### Halaman CV
+
+`/cv` sepenuhnya mengambil data dari database: header dan ringkasan dari tabel
+`profile`, skill dari tabel `skills`, dan project dari tabel `projects`. Tidak ada
+lagi data yang di-hardcode, jadi CV tidak bisa lagi berbeda dari halaman utama.
+Field khusus CV (`cv_headline`, `cv_summary`, soft skills, dan bahasa) diatur di
+menu **Profile**.
+
+### Menyembunyikan fitur
+
+Menu **Settings** menyimpan toggle di tabel `site_settings`: section About,
+Skills, Projects, Contact, halaman CV, background 3D, dan tombol Login di navbar.
+Mematikan toggle hanya menyembunyikan tampilannya — datanya tetap di database dan
+bisa dinyalakan lagi kapan saja. Khusus `cv_enabled`, rute `/cv` akan membalas 404
+saat dimatikan, dan link CV di navbar serta section Contact ikut hilang.
+
+Toggle **Tombol Login di navbar** hanya menyembunyikan tombolnya; `/admin/login`
+tetap bisa diakses langsung dan tetap dilindungi Supabase Auth + RLS.
+
+Jika tabel `site_settings` atau kolom CV belum ada (migration belum dijalankan),
+semua fitur dianggap aktif dan halaman publik tetap tampil normal. Halaman
+`/admin/settings` akan menampilkan peringatan berisi instruksi migration.
 
 Environment yang dibutuhkan:
 

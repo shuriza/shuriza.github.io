@@ -1,14 +1,15 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { SKILL_ICON_OPTIONS, type Skill } from "@/lib/skills";
+import { useReveal } from "@/components/useReveal";
 
 const categoryOrder = ["Frontend", "Backend", "Tools"] as const;
 
 export default function Skills({ skills }: { skills: Skill[] }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useReveal(ref);
   const skillCategories = categoryOrder
     .map((title) => ({
       title,

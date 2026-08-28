@@ -19,8 +19,8 @@ const fallbackProjects: Project[] = [
     description:
       "E-commerce platform with product catalog, shopping cart, and order management system.",
     tech: ["Next.js", "React", "Tailwind CSS", "TypeScript"],
-    github: "https://github.com/shuriza/shuriza-store",
-    demo: "https://shurizastore.my.id/",
+    github: null,
+    demo: "https://shurizastore.biz.id/",
     featured: true,
     published: true,
     sort_order: 0,

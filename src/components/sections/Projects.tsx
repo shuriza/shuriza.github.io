@@ -1,13 +1,14 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 import type { Project } from "@/lib/projects";
+import { useReveal } from "@/components/useReveal";
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useReveal(ref);
 
   return (
     <motion.div
@@ -81,8 +82,8 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
 }
 
 export default function Projects({ projects }: { projects: Project[] }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useReveal(ref);
 
   return (
     <section id="projects" className="py-24 px-6 relative">

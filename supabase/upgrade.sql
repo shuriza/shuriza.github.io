@@ -98,3 +98,73 @@ select * from (values
   ('Vercel', 'Tools', 'SiVercel', '#ffffff', 2), ('VS Code', 'Tools', 'VscVscode', '#007ACC', 3)
 ) as seed(name, category, icon, color, sort_order)
 where not exists (select 1 from public.skills);
+
+-- ============================================================
+-- CV content + feature toggles (idempotent, aman dijalankan ulang)
+-- ============================================================
+
+alter table public.profile add column if not exists cv_headline text not null default '';
+alter table public.profile add column if not exists cv_summary text not null default '';
+alter table public.profile add column if not exists soft_skills text[] not null default '{}';
+alter table public.profile add column if not exists languages jsonb not null default '[]'::jsonb;
+
+-- Section Education dihapus dari CV; kolomnya ikut dibuang agar tidak jadi data mati.
+alter table public.profile drop column if exists cv_education;
+
+-- Timpa ringkasan lama bergaya mahasiswa hanya jika masih boilerplate default,
+-- supaya ringkasan yang sudah diedit manual lewat admin tidak ikut tertimpa.
+update public.profile
+set cv_summary = 'Fullstack web developer dengan fokus pada pengembangan web modern: React/Next.js untuk frontend dan Laravel untuk backend. Terbiasa membangun aplikasi produksi end-to-end — dari desain database, REST API, integrasi layanan pihak ketiga, hingga deployment. Terbuka untuk peluang freelance, kontrak, dan full-time.'
+where id = 1 and cv_summary like 'Mahasiswa D3%';
+
+-- Isi awal field CV dari data profile yang sudah ada.
+update public.profile
+set
+  cv_headline = coalesce(nullif(cv_headline, ''), role),
+  cv_summary = coalesce(
+    nullif(cv_summary, ''),
+    'Fullstack web developer dengan fokus pada pengembangan web modern: React/Next.js untuk frontend dan Laravel untuk backend. Terbiasa membangun aplikasi produksi end-to-end — dari desain database, REST API, integrasi layanan pihak ketiga, hingga deployment. Terbuka untuk peluang freelance, kontrak, dan full-time.'
+  ),
+  soft_skills = case
+    when coalesce(cardinality(soft_skills), 0) = 0
+      then array['Self-learning', 'Problem Solving', 'Team Collaboration', 'Time Management']
+    else soft_skills
+  end,
+  languages = case
+    when jsonb_array_length(languages) = 0
+      then '[{"name":"Bahasa Indonesia","level":"Native"},{"name":"English","level":"Basic"}]'::jsonb
+    else languages
+  end
+where id = 1;
+
+create table if not exists public.site_settings (
+  id integer primary key default 1 check (id = 1),
+  about_enabled boolean not null default true,
+  skills_enabled boolean not null default true,
+  projects_enabled boolean not null default true,
+  contact_enabled boolean not null default true,
+  cv_enabled boolean not null default true,
+  particles_enabled boolean not null default true,
+  admin_link_enabled boolean not null default true,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.site_settings enable row level security;
+
+do $$
+begin
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'site_settings' and policyname = 'Anyone can read site settings') then
+    create policy "Anyone can read site settings" on public.site_settings for select to anon, authenticated using (true);
+  end if;
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'site_settings' and policyname = 'Admins can insert site settings') then
+    create policy "Admins can insert site settings" on public.site_settings for insert to authenticated
+      with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+  end if;
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'site_settings' and policyname = 'Admins can update site settings') then
+    create policy "Admins can update site settings" on public.site_settings for update to authenticated
+      using (exists (select 1 from public.admin_users where user_id = auth.uid()))
+      with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+  end if;
+end $$;
+
+insert into public.site_settings (id) values (1) on conflict (id) do nothing;

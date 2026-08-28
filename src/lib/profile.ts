@@ -1,4 +1,10 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+export interface CvLanguage {
+  name: string;
+  level: string;
+}
 
 export interface Profile {
   id: number;
@@ -17,6 +23,12 @@ export interface Profile {
   website: string;
   hero_roles: string[];
   hero_description: string;
+  /** Headline khusus halaman CV. Kosong berarti pakai `role`. */
+  cv_headline: string;
+  /** Paragraf ringkasan di bagian atas CV. */
+  cv_summary: string;
+  soft_skills: string[];
+  languages: CvLanguage[];
 }
 
 export const fallbackProfile: Profile = {
@@ -44,9 +56,31 @@ export const fallbackProfile: Profile = {
   ],
   hero_description:
     "Saya membangun aplikasi web yang rapi, cepat, dan siap dipakai menggunakan React, Next.js, dan Laravel.",
+  cv_headline: "Fullstack Web Developer",
+  cv_summary:
+    "Fullstack web developer dengan fokus pada pengembangan web modern: React/Next.js untuk frontend dan Laravel untuk backend. Terbiasa membangun aplikasi produksi end-to-end — dari desain database, REST API, integrasi layanan pihak ketiga, hingga deployment. Terbuka untuk peluang freelance, kontrak, dan full-time.",
+  soft_skills: ["Self-learning", "Problem Solving", "Team Collaboration", "Time Management"],
+  languages: [
+    { name: "Bahasa Indonesia", level: "Native" },
+    { name: "English", level: "Basic" },
+  ],
 };
 
-export async function getProfile(): Promise<Profile> {
+/** Kolom `languages` disimpan sebagai jsonb, jadi bentuknya harus divalidasi saat dibaca. */
+function normalizeLanguages(value: unknown): CvLanguage[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null)
+    .map((item) => ({
+      name: String(item.name ?? "").trim(),
+      level: String(item.level ?? "").trim(),
+    }))
+    .filter((item) => item.name.length > 0);
+}
+
+/** Dibungkus `cache()` agar `generateMetadata` dan page tidak query dua kali per request. */
+export const getProfile = cache(async (): Promise<Profile> => {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return fallbackProfile;
   }
@@ -61,5 +95,20 @@ export async function getProfile(): Promise<Profile> {
     return fallbackProfile;
   }
 
-  return { ...fallbackProfile, ...data } as Profile;
-}
+  const merged = { ...fallbackProfile, ...data } as Profile;
+
+  // Kolom CV baru mungkin belum ada jika migration terakhir belum dijalankan,
+  // jadi setiap field di-resolve satu per satu dengan fallback yang aman.
+  return {
+    ...merged,
+    cv_headline: merged.cv_headline || merged.role || fallbackProfile.cv_headline,
+    cv_summary: merged.cv_summary || fallbackProfile.cv_summary,
+    soft_skills: Array.isArray(data.soft_skills)
+      ? data.soft_skills.map((item: unknown) => String(item))
+      : fallbackProfile.soft_skills,
+    languages:
+      data.languages === undefined
+        ? fallbackProfile.languages
+        : normalizeLanguages(data.languages),
+  };
+});

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { deleteProject, signOut } from "@/app/admin/actions";
+import AdminNav from "@/app/admin/AdminNav";
+import { deleteProject } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
 import type { Project } from "@/lib/projects";
 
@@ -21,22 +22,14 @@ export default async function AdminProjectsPage() {
             <h1 className="text-3xl font-bold text-white">Projects</h1>
             <p className="mt-2 text-sm text-slate-400">Login sebagai {user.email}</p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Link href="/admin/skills" className="rounded-lg border border-[#475569] px-4 py-2 text-sm text-slate-300 hover:border-cyan-400 hover:text-cyan-300">
-              Skills
-            </Link>
-            <Link href="/admin/profile" className="rounded-lg border border-[#475569] px-4 py-2 text-sm text-slate-300 hover:border-cyan-400 hover:text-cyan-300">
-              Profile
-            </Link>
-            <Link href="/admin/projects/new" className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-[#0a0a0f] hover:bg-cyan-400">
-              + Tambah project
-            </Link>
-            <form action={signOut}>
-              <button className="rounded-lg border border-[#475569] px-4 py-2 text-sm text-slate-300 hover:border-cyan-400 hover:text-cyan-300">
-                Keluar
-              </button>
-            </form>
-          </div>
+          <AdminNav
+            active="/admin/projects"
+            action={
+              <Link href="/admin/projects/new" className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-[#0a0a0f] hover:bg-cyan-400">
+                + Tambah project
+              </Link>
+            }
+          />
         </header>
 
         {error && <p className="mb-5 text-sm text-red-400">Gagal memuat project: {error.message}</p>}
