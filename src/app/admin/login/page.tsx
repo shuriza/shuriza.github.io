@@ -24,28 +24,25 @@ function LoginForm() {
     setLoading(true);
     setError("");
 
-    let supabase;
     try {
-      supabase = createSupabaseBrowserClient();
+      const supabase = createSupabaseBrowserClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        setError("Email atau password tidak valid.");
+        return;
+      }
+
+      router.push("/admin/projects");
+      router.refresh();
     } catch {
-      setError("Konfigurasi Supabase belum lengkap. Tambahkan environment variable di Vercel.");
+      setError("Login tidak dapat diproses. Periksa koneksi atau konfigurasi Supabase.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (signInError) {
-      setError("Email atau password tidak valid.");
-      setLoading(false);
-      return;
-    }
-
-    router.push("/admin/projects");
-    router.refresh();
   }
 
   return (
@@ -84,7 +81,7 @@ function LoginForm() {
                 autoComplete="current-password"
               />
             </label>
-            {error && <p className="text-sm text-red-400">{error}</p>}
+            {error && <p role="alert" className="text-sm text-red-400">{error}</p>}
             <button
               type="submit"
               disabled={loading}

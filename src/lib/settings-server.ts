@@ -1,33 +1,29 @@
-import { cache } from "react";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { createAnonymousSupabaseClient, isMissingRelationError } from "@/lib/supabase/anonymous";
 import { fallbackSettings, resolveSettings, type SiteSettings } from "@/lib/settings";
 
-/**
- * Dibungkus `cache()` agar halaman yang memanggilnya lebih dari sekali
- * (mis. `generateMetadata` dan komponen page) hanya sekali query per request.
- */
-export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return fallbackSettings;
-  }
+export const SETTINGS_CACHE_TAG = "public-settings";
 
-  const supabase = await createSupabaseServerClient();
-  if (!supabase) return fallbackSettings;
+const getCachedSiteSettings = unstable_cache(async (): Promise<SiteSettings> => {
+  const supabase = createAnonymousSupabaseClient();
+  if (!supabase) throw new Error("Supabase belum dikonfigurasi.");
 
-  const { data, error } = await supabase
-    .from("site_settings")
+  const response = await supabase
+    .from("portfolio_site_settings")
     .select("*")
     .eq("id", 1)
     .maybeSingle();
+  const { data, error } = isMissingRelationError(response.error, "portfolio_site_settings")
+    ? await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle()
+    : response;
 
   if (error || !data) {
-    // Tabel belum ada atau baris belum dibuat: anggap semua fitur aktif.
-    if (error) console.error("[settings] gagal membaca site_settings:", error.message);
-    else console.warn("[settings] baris site_settings id=1 tidak ada, semua fitur dianggap aktif.");
+    console.error("[settings] gagal memuat data publik:", error ?? "baris pengaturan situs utama tidak ditemukan");
     return fallbackSettings;
   }
 
-  const settings = resolveSettings(data);
+  // The public view is intentionally not part of the generated Supabase schema.
+  const settings = resolveSettings(data as Record<string, unknown>);
   const disabled = Object.entries(settings)
     .filter(([key, value]) => key !== "id" && value === false)
     .map(([key]) => key);
@@ -37,4 +33,12 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
   }
 
   return settings;
-});
+}, [SETTINGS_CACHE_TAG], { tags: [SETTINGS_CACHE_TAG], revalidate: 300 });
+
+export async function getSiteSettings(): Promise<SiteSettings> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return fallbackSettings;
+  }
+
+  return getCachedSiteSettings();
+}

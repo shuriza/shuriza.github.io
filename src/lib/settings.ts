@@ -7,7 +7,7 @@ export const FEATURE_TOGGLES = [
   {
     key: "about_enabled",
     label: "Section About",
-    description: "Terminal animasi dan bio di halaman utama.",
+    description: "Ringkasan profil dan bio di halaman utama.",
   },
   {
     key: "skills_enabled",

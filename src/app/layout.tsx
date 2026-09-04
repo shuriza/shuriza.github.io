@@ -3,18 +3,22 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
-  variable: "--font-geist-sans",
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "M. Firdaus Suryaningrat | Fullstack Web Developer",
+  metadataBase: new URL("https://shuriza.tech"),
+  title: {
+    default: "M. Firdaus Suryaningrat | Junior Fullstack Web Developer",
+    template: "%s | Shuriza",
+  },
   description:
-    "Portfolio M. Firdaus Suryaningrat (Shuriza), fullstack web developer dari Kediri yang membangun aplikasi web modern dengan React, Next.js, dan Laravel.",
+    "Portfolio M. Firdaus Suryaningrat (Shuriza), junior fullstack web developer dari Kediri.",
   keywords: [
     "M. Firdaus Suryaningrat",
     "Shuriza",
-    "fullstack web developer",
+    "junior fullstack web developer",
     "React",
     "Next.js",
     "Laravel",
@@ -22,9 +26,17 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "M. Firdaus Suryaningrat" }],
   openGraph: {
-    title: "M. Firdaus Suryaningrat | Fullstack Web Developer",
-    description: "Membangun aplikasi web modern dari Kediri, Jawa Timur.",
+    title: "M. Firdaus Suryaningrat | Junior Fullstack Web Developer",
+    description: "Portfolio web developer dari Kediri, Jawa Timur.",
     type: "website",
+    url: "/",
+    siteName: "Shuriza",
+    locale: "id_ID",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/opengraph-image"],
   },
 };
 

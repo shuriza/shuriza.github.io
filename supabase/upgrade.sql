@@ -1,5 +1,9 @@
 -- Jalankan file ini jika schema.sql versi project sudah pernah dijalankan.
 -- File ini aman dijalankan setelah tabel projects/admin_users sudah tersedia.
+-- Phase 1 (expand): aman dijalankan sebelum atau sesudah deploy aplikasi baru.
+-- Jalankan supabase/lockdown.sql hanya setelah aplikasi baru terverifikasi di production.
+
+begin;
 
 create table if not exists public.skills (
   id uuid primary key default gen_random_uuid(),
@@ -92,6 +96,10 @@ set
   website = 'https://shuriza.tech'
 where id = 1;
 
+update public.profile
+set display_name = 'M. Firdaus Suryaningrat'
+where id = 1 and btrim(display_name) in ('', '-');
+
 insert into public.skills (name, category, icon, color, sort_order)
 select * from (values
   ('React', 'Frontend', 'SiReact', '#61DAFB', 0), ('Next.js', 'Frontend', 'SiNextdotjs', '#ffffff', 1),
@@ -182,3 +190,46 @@ begin
 end $$;
 
 insert into public.site_settings (id) values (1) on conflict (id) do nothing;
+
+-- Public views keep the API stable and prevent future private columns from
+-- becoming readable merely because they are added to base tables. Legacy base
+-- table reads intentionally remain until the contract phase in lockdown.sql.
+create or replace view public.portfolio_profile with (security_barrier = true) as
+select
+  id, display_name, short_name, role, bio_primary, bio_secondary, location,
+  focus, education, status, email, github, linkedin, website, hero_roles,
+  hero_description, cv_headline, cv_summary, soft_skills, languages
+from public.profile
+where id = 1;
+
+create or replace view public.portfolio_site_settings with (security_barrier = true) as
+select
+  id, about_enabled, skills_enabled, projects_enabled, contact_enabled,
+  cv_enabled, particles_enabled, admin_link_enabled
+from public.site_settings
+where id = 1;
+
+create or replace view public.portfolio_projects with (security_barrier = true) as
+select id, title, description, tech, github, demo, featured, published, sort_order
+from public.projects
+where published = true;
+
+create or replace view public.portfolio_skills with (security_barrier = true) as
+select id, name, category, icon, color, published, sort_order
+from public.skills
+where published = true;
+
+-- Views are automatically updatable unless their ACL is explicitly restricted.
+revoke all on table public.portfolio_profile, public.portfolio_site_settings,
+  public.portfolio_projects, public.portfolio_skills from anon, authenticated, PUBLIC;
+grant select on table public.portfolio_profile to anon, authenticated;
+grant select on table public.portfolio_site_settings to anon, authenticated;
+grant select on table public.portfolio_projects to anon, authenticated;
+grant select on table public.portfolio_skills to anon, authenticated;
+
+-- Keep the prior release operational until the view-based release is verified.
+grant select on table public.profile, public.site_settings, public.projects, public.skills to anon;
+
+notify pgrst, 'reload schema';
+
+commit;

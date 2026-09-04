@@ -1,5 +1,3 @@
-"use client";
-
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import type { Profile } from "@/lib/profile";
 
@@ -12,7 +10,7 @@ export default function Footer({ profile }: { profile: Profile }) {
   return (
     <footer className="border-t border-[#334155]/50 bg-[#0a0a0f]">
       <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-400">
           &copy; {new Date().getFullYear()} Shuriza. All rights reserved.
         </p>
 
@@ -26,12 +24,12 @@ export default function Footer({ profile }: { profile: Profile }) {
               className="text-slate-400 hover:text-cyan-400 transition-colors"
               aria-label={link.label}
             >
-              <link.icon size={20} />
+              <link.icon aria-hidden="true" size={20} />
             </a>
           ))}
         </div>
 
-        <p className="text-xs text-slate-600">
+        <p className="text-xs text-slate-400">
           Built with Next.js & Three.js
         </p>
       </div>

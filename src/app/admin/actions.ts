@@ -1,86 +1,95 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
+import {
+  AdminValidationError,
+  isUuid,
+  readProfileInput,
+  readProjectInput,
+  readSkillInput,
+} from "@/lib/admin-validation";
 import { requireAdmin } from "@/lib/admin";
-import { SKILL_CATEGORIES, SKILL_ICON_OPTIONS } from "@/lib/skills";
+import { PROFILE_CACHE_TAG } from "@/lib/profile";
+import { PROJECTS_CACHE_TAG } from "@/lib/projects";
+import { SETTINGS_CACHE_TAG } from "@/lib/settings-server";
 import { FEATURE_TOGGLES } from "@/lib/settings";
+import { SKILLS_CACHE_TAG } from "@/lib/skills-server";
 
-/** Halaman publik yang menampilkan data dari database. */
-function revalidatePublicPages() {
-  revalidatePath("/");
-  revalidatePath("/cv");
+function errorUrl(path: string, message: string) {
+  return `${path}?error=${encodeURIComponent(message)}`;
 }
 
-function readProjectForm(formData: FormData) {
-  const title = String(formData.get("title") ?? "").trim();
-  const description = String(formData.get("description") ?? "").trim();
-  const tech = String(formData.get("tech") ?? "")
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .slice(0, 20);
-  const github = String(formData.get("github") ?? "").trim() || null;
-  const demo = String(formData.get("demo") ?? "").trim() || null;
-  const featured = formData.get("featured") === "on";
-  const published = formData.get("published") === "on";
-  const sortOrder = Number.parseInt(String(formData.get("sort_order") ?? "0"), 10);
+function validationMessage(error: unknown) {
+  return error instanceof AdminValidationError ? error.message : "Data yang dikirim tidak valid.";
+}
 
-  if (!title || !description) {
-    redirect("/admin/projects/new?error=Title%20dan%20description%20wajib%20diisi");
-  }
+function reportWriteError(operation: string, error: unknown) {
+  console.error(`[admin] ${operation} gagal:`, error);
+}
 
-  for (const url of [github, demo]) {
-    if (url && !/^https:\/\//i.test(url)) {
-      redirect("/admin/projects/new?error=Link%20harus%20menggunakan%20HTTPS");
-    }
-  }
-
-  return {
-    title,
-    description,
-    tech,
-    github,
-    demo,
-    featured,
-    published,
-    sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
-  };
+function revalidatePublicData(tag: string, adminPath: string) {
+  revalidateTag(tag, { expire: 0 });
+  revalidatePath("/");
+  revalidatePath("/cv");
+  revalidatePath(adminPath);
 }
 
 export async function createProject(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const project = readProjectForm(formData);
-  const { error } = await supabase.from("projects").insert(project);
+  let project;
+  try {
+    project = readProjectInput(formData);
+  } catch (error) {
+    redirect(errorUrl("/admin/projects/new", validationMessage(error)));
+  }
 
-  if (error) redirect(`/admin/projects/new?error=${encodeURIComponent(error.message)}`);
+  const { data, error } = await supabase.from("projects").insert(project).select("id");
+  if (error || data?.length !== 1) {
+    reportWriteError("membuat project", error ?? "Jumlah baris hasil bukan satu");
+    redirect(errorUrl("/admin/projects/new", "Project gagal disimpan. Coba lagi."));
+  }
 
-  revalidatePublicPages();
+  revalidatePublicData(PROJECTS_CACHE_TAG, "/admin/projects");
   redirect("/admin/projects");
 }
 
 export async function updateProject(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const id = String(formData.get("id") ?? "");
-  const project = readProjectForm(formData);
-  const { error } = await supabase.from("projects").update(project).eq("id", id);
+  const id = String(formData.get("id") ?? "").trim();
+  if (!isUuid(id)) redirect(errorUrl("/admin/projects", "ID project tidak valid."));
 
-  if (error) {
-    redirect(`/admin/projects/${id}/edit?error=${encodeURIComponent(error.message)}`);
+  let project;
+  try {
+    project = readProjectInput(formData);
+  } catch (error) {
+    redirect(errorUrl(`/admin/projects/${id}/edit`, validationMessage(error)));
   }
 
-  revalidatePublicPages();
+  const { data, error } = await supabase.from("projects").update(project).eq("id", id).select("id");
+  if (error || data?.length !== 1) {
+    reportWriteError("memperbarui project", error ?? "Project tidak ditemukan");
+    redirect(errorUrl(`/admin/projects/${id}/edit`, "Project gagal diperbarui atau sudah tidak ada."));
+  }
+
+  revalidatePublicData(PROJECTS_CACHE_TAG, "/admin/projects");
+  revalidatePath(`/admin/projects/${id}/edit`);
   redirect("/admin/projects");
 }
 
 export async function deleteProject(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const id = String(formData.get("id") ?? "");
-  const { error } = await supabase.from("projects").delete().eq("id", id);
+  const id = String(formData.get("id") ?? "").trim();
+  if (!isUuid(id)) redirect(errorUrl("/admin/projects", "ID project tidak valid."));
 
-  if (error) redirect(`/admin/projects?error=${encodeURIComponent(error.message)}`);
+  const { data, error } = await supabase.from("projects").delete().eq("id", id).select("id");
+  if (error || data?.length !== 1) {
+    reportWriteError("menghapus project", error ?? "Project tidak ditemukan");
+    redirect(errorUrl("/admin/projects", "Project gagal dihapus atau sudah tidak ada."));
+  }
 
-  revalidatePublicPages();
+  revalidatePublicData(PROJECTS_CACHE_TAG, "/admin/projects");
+  revalidatePath(`/admin/projects/${id}/edit`);
   redirect("/admin/projects");
 }
 
@@ -90,127 +99,99 @@ export async function signOut() {
   redirect("/admin/login");
 }
 
-function readSkillForm(formData: FormData) {
-  const name = String(formData.get("name") ?? "").trim();
-  const category = String(formData.get("category") ?? "");
-  const icon = String(formData.get("icon") ?? "TbApi");
-  const color = String(formData.get("color") ?? "#22d3ee").trim();
-  const sortOrder = Number.parseInt(String(formData.get("sort_order") ?? "0"), 10);
-
-  if (!name || !SKILL_CATEGORIES.includes(category as (typeof SKILL_CATEGORIES)[number])) {
-    redirect("/admin/skills/new?error=Nama%20dan%20kategori%20skill%20wajib%20diisi");
-  }
-  if (!(icon in SKILL_ICON_OPTIONS) || !/^#[0-9a-f]{6}$/i.test(color)) {
-    redirect("/admin/skills/new?error=Icon%20atau%20warna%20tidak%20valid");
-  }
-
-  return {
-    name,
-    category,
-    icon,
-    color,
-    published: formData.get("published") === "on",
-    sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
-  };
-}
-
 export async function createSkill(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const skill = readSkillForm(formData);
-  const { error } = await supabase.from("skills").insert(skill);
+  let skill;
+  try {
+    skill = readSkillInput(formData);
+  } catch (error) {
+    redirect(errorUrl("/admin/skills/new", validationMessage(error)));
+  }
 
-  if (error) redirect(`/admin/skills/new?error=${encodeURIComponent(error.message)}`);
+  const { data, error } = await supabase.from("skills").insert(skill).select("id");
+  if (error || data?.length !== 1) {
+    reportWriteError("membuat skill", error ?? "Jumlah baris hasil bukan satu");
+    redirect(errorUrl("/admin/skills/new", "Skill gagal disimpan. Coba lagi."));
+  }
 
-  revalidatePublicPages();
+  revalidatePublicData(SKILLS_CACHE_TAG, "/admin/skills");
   redirect("/admin/skills");
 }
 
 export async function updateSkill(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const id = String(formData.get("id") ?? "");
-  const skill = readSkillForm(formData);
-  const { error } = await supabase.from("skills").update(skill).eq("id", id);
+  const id = String(formData.get("id") ?? "").trim();
+  if (!isUuid(id)) redirect(errorUrl("/admin/skills", "ID skill tidak valid."));
 
-  if (error) redirect(`/admin/skills/${id}/edit?error=${encodeURIComponent(error.message)}`);
+  let skill;
+  try {
+    skill = readSkillInput(formData);
+  } catch (error) {
+    redirect(errorUrl(`/admin/skills/${id}/edit`, validationMessage(error)));
+  }
 
-  revalidatePublicPages();
+  const { data, error } = await supabase.from("skills").update(skill).eq("id", id).select("id");
+  if (error || data?.length !== 1) {
+    reportWriteError("memperbarui skill", error ?? "Skill tidak ditemukan");
+    redirect(errorUrl(`/admin/skills/${id}/edit`, "Skill gagal diperbarui atau sudah tidak ada."));
+  }
+
+  revalidatePublicData(SKILLS_CACHE_TAG, "/admin/skills");
+  revalidatePath(`/admin/skills/${id}/edit`);
   redirect("/admin/skills");
 }
 
 export async function deleteSkill(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const id = String(formData.get("id") ?? "");
-  const { error } = await supabase.from("skills").delete().eq("id", id);
+  const id = String(formData.get("id") ?? "").trim();
+  if (!isUuid(id)) redirect(errorUrl("/admin/skills", "ID skill tidak valid."));
 
-  if (error) redirect(`/admin/skills?error=${encodeURIComponent(error.message)}`);
+  const { data, error } = await supabase.from("skills").delete().eq("id", id).select("id");
+  if (error || data?.length !== 1) {
+    reportWriteError("menghapus skill", error ?? "Skill tidak ditemukan");
+    redirect(errorUrl("/admin/skills", "Skill gagal dihapus atau sudah tidak ada."));
+  }
 
-  revalidatePublicPages();
+  revalidatePublicData(SKILLS_CACHE_TAG, "/admin/skills");
+  revalidatePath(`/admin/skills/${id}/edit`);
   redirect("/admin/skills");
 }
 
 export async function updateProfile(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const fields = [
-    "display_name", "short_name", "role", "bio_primary", "bio_secondary",
-    "location", "focus", "education", "status", "email", "github", "linkedin",
-    "website", "hero_description", "cv_headline", "cv_summary",
-  ];
-  const profile = Object.fromEntries(fields.map((field) => [field, String(formData.get(field) ?? "").trim()]));
-  const heroRoles = String(formData.get("hero_roles") ?? "")
-    .split("\n")
-    .map((role) => role.trim())
-    .filter(Boolean)
-    .slice(0, 8);
-  const softSkills = String(formData.get("soft_skills") ?? "")
-    .split("\n")
-    .map((skill) => skill.trim())
-    .filter(Boolean)
-    .slice(0, 12);
-  // Satu baris per bahasa dengan format "Nama | Level".
-  const languages = String(formData.get("languages") ?? "")
-    .split("\n")
-    .map((line) => {
-      const [name, level] = line.split("|");
-      return { name: (name ?? "").trim(), level: (level ?? "").trim() };
-    })
-    .filter((language) => language.name.length > 0)
-    .slice(0, 8);
-
-  if (fields.some((field) => !profile[field])) {
-    redirect("/admin/profile?error=Semua%20field%20wajib%20diisi");
+  let profile;
+  try {
+    profile = readProfileInput(formData);
+  } catch (error) {
+    redirect(errorUrl("/admin/profile", validationMessage(error)));
   }
-  for (const url of [profile.github, profile.linkedin, profile.website]) {
-    if (!/^https:\/\//i.test(url)) redirect("/admin/profile?error=Link%20harus%20menggunakan%20HTTPS");
+
+  const { data, error } = await supabase.from("profile").update(profile).eq("id", 1).select("id");
+  if (error || data?.length !== 1 || data[0]?.id !== 1) {
+    reportWriteError("memperbarui profile", error ?? "Profile tidak ditemukan");
+    redirect(errorUrl("/admin/profile", "Profile gagal disimpan. Coba lagi."));
   }
-  if (!heroRoles.length) redirect("/admin/profile?error=Minimal%20satu%20role%20hero%20wajib%20diisi");
 
-  const { error } = await supabase.from("profile").upsert({
-    id: 1,
-    ...profile,
-    hero_roles: heroRoles,
-    soft_skills: softSkills,
-    languages,
-  });
-  if (error) redirect(`/admin/profile?error=${encodeURIComponent(error.message)}`);
-
-  revalidatePublicPages();
+  revalidatePublicData(PROFILE_CACHE_TAG, "/admin/profile");
   redirect("/admin/profile?saved=1");
 }
 
 export async function updateSettings(formData: FormData) {
   const { supabase } = await requireAdmin();
-
-  // Checkbox yang tidak dicentang tidak ikut terkirim, jadi absennya berarti false.
   const flags = Object.fromEntries(
-    FEATURE_TOGGLES.map((toggle) => [toggle.key, formData.get(toggle.key) === "on"])
+    FEATURE_TOGGLES.map((toggle) => [toggle.key, formData.get(toggle.key) === "on"]),
   );
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("site_settings")
-    .upsert({ id: 1, ...flags, updated_at: new Date().toISOString() });
+    .update({ ...flags, updated_at: new Date().toISOString() })
+    .eq("id", 1)
+    .select("id");
+  if (error || data?.length !== 1 || data[0]?.id !== 1) {
+    reportWriteError("memperbarui pengaturan", error ?? "Pengaturan tidak ditemukan");
+    redirect(errorUrl("/admin/settings", "Pengaturan gagal disimpan. Coba lagi."));
+  }
 
-  if (error) redirect(`/admin/settings?error=${encodeURIComponent(error.message)}`);
-
-  revalidatePublicPages();
+  revalidatePublicData(SETTINGS_CACHE_TAG, "/admin/settings");
   redirect("/admin/settings?saved=1");
 }

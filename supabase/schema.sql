@@ -1,3 +1,5 @@
+begin;
+
 create table public.admin_users (
   user_id uuid primary key references auth.users(id) on delete cascade,
   created_at timestamptz not null default now()
@@ -138,8 +140,9 @@ begin
     create policy "Admins can delete skills" on public.skills for delete to authenticated
       using (exists (select 1 from public.admin_users where user_id = auth.uid()));
   end if;
-  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'profile' and policyname = 'Anyone can read profile') then
-    create policy "Anyone can read profile" on public.profile for select to anon, authenticated using (true);
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'profile' and policyname = 'Admins can read profile') then
+    create policy "Admins can read profile" on public.profile for select to authenticated
+      using (exists (select 1 from public.admin_users where user_id = auth.uid()));
   end if;
   if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'profile' and policyname = 'Admins can insert profile') then
     create policy "Admins can insert profile" on public.profile for insert to authenticated
@@ -258,8 +261,9 @@ alter table public.site_settings enable row level security;
 
 do $$
 begin
-  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'site_settings' and policyname = 'Anyone can read site settings') then
-    create policy "Anyone can read site settings" on public.site_settings for select to anon, authenticated using (true);
+  if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'site_settings' and policyname = 'Admins can read site settings') then
+    create policy "Admins can read site settings" on public.site_settings for select to authenticated
+      using (exists (select 1 from public.admin_users where user_id = auth.uid()));
   end if;
   if not exists (select 1 from pg_policies where schemaname = 'public' and tablename = 'site_settings' and policyname = 'Admins can insert site settings') then
     create policy "Admins can insert site settings" on public.site_settings for insert to authenticated
@@ -273,3 +277,105 @@ begin
 end $$;
 
 insert into public.site_settings (id) values (1) on conflict (id) do nothing;
+
+-- Canonical RLS policies. Dropping known names first also repairs stale policy
+-- definitions when this script is run against an older deployment.
+drop policy if exists "Admins can read their admin record" on public.admin_users;
+drop policy if exists "Anyone can read published projects" on public.projects;
+drop policy if exists "Admins can read projects" on public.projects;
+drop policy if exists "Admins can insert projects" on public.projects;
+drop policy if exists "Admins can update projects" on public.projects;
+drop policy if exists "Admins can delete projects" on public.projects;
+drop policy if exists "Anyone can read published skills" on public.skills;
+drop policy if exists "Admins can read skills" on public.skills;
+drop policy if exists "Admins can insert skills" on public.skills;
+drop policy if exists "Admins can update skills" on public.skills;
+drop policy if exists "Admins can delete skills" on public.skills;
+drop policy if exists "Anyone can read profile" on public.profile;
+drop policy if exists "Admins can read profile" on public.profile;
+drop policy if exists "Admins can insert profile" on public.profile;
+drop policy if exists "Admins can update profile" on public.profile;
+drop policy if exists "Anyone can read site settings" on public.site_settings;
+drop policy if exists "Admins can read site settings" on public.site_settings;
+drop policy if exists "Admins can insert site settings" on public.site_settings;
+drop policy if exists "Admins can update site settings" on public.site_settings;
+
+create policy "Admins can read their admin record" on public.admin_users for select to authenticated
+  using (user_id = auth.uid());
+create policy "Admins can read projects" on public.projects for select to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can insert projects" on public.projects for insert to authenticated
+  with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can update projects" on public.projects for update to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()))
+  with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can delete projects" on public.projects for delete to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can read skills" on public.skills for select to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can insert skills" on public.skills for insert to authenticated
+  with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can update skills" on public.skills for update to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()))
+  with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can delete skills" on public.skills for delete to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can read profile" on public.profile for select to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can insert profile" on public.profile for insert to authenticated
+  with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can update profile" on public.profile for update to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()))
+  with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can read site settings" on public.site_settings for select to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can insert site settings" on public.site_settings for insert to authenticated
+  with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+create policy "Admins can update site settings" on public.site_settings for update to authenticated
+  using (exists (select 1 from public.admin_users where user_id = auth.uid()))
+  with check (exists (select 1 from public.admin_users where user_id = auth.uid()));
+
+-- Views keep the public API stable and prevent future private columns from
+-- becoming readable merely because they are added to the base tables.
+create or replace view public.portfolio_profile with (security_barrier = true) as
+select
+  id, display_name, short_name, role, bio_primary, bio_secondary, location,
+  focus, education, status, email, github, linkedin, website, hero_roles,
+  hero_description, cv_headline, cv_summary, soft_skills, languages
+from public.profile
+where id = 1;
+
+create or replace view public.portfolio_site_settings with (security_barrier = true) as
+select
+  id, about_enabled, skills_enabled, projects_enabled, contact_enabled,
+  cv_enabled, particles_enabled, admin_link_enabled
+from public.site_settings
+where id = 1;
+
+create or replace view public.portfolio_projects with (security_barrier = true) as
+select id, title, description, tech, github, demo, featured, published, sort_order
+from public.projects
+where published = true;
+
+create or replace view public.portfolio_skills with (security_barrier = true) as
+select id, name, category, icon, color, published, sort_order
+from public.skills
+where published = true;
+
+revoke all on table public.admin_users, public.profile, public.site_settings,
+  public.projects, public.skills from anon, authenticated, PUBLIC;
+grant select on table public.admin_users to authenticated;
+grant select, insert, update on table public.profile to authenticated;
+grant select, insert, update on table public.site_settings to authenticated;
+grant select, insert, update, delete on table public.projects to authenticated;
+grant select, insert, update, delete on table public.skills to authenticated;
+revoke all on table public.portfolio_profile, public.portfolio_site_settings,
+  public.portfolio_projects, public.portfolio_skills from anon, authenticated, PUBLIC;
+grant select on table public.portfolio_profile to anon, authenticated;
+grant select on table public.portfolio_site_settings to anon, authenticated;
+grant select on table public.portfolio_projects to anon, authenticated;
+grant select on table public.portfolio_skills to anon, authenticated;
+
+notify pgrst, 'reload schema';
+
+commit;

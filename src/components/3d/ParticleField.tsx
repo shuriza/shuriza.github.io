@@ -1,34 +1,28 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-// SSR-safe mount check without useEffect + setState
-const emptySubscribe = () => () => {};
-function useIsMounted() {
-  return useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  );
-}
-
-// Generate particle data outside of render to avoid impure function calls
+// Generate particle data outside of render to avoid impure function calls.
 function generateParticles(count: number) {
   const positions = new Float32Array(count * 3);
+  const origins = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
   const speeds = new Float32Array(count);
 
   for (let i = 0; i < count; i++) {
-    positions[i * 3] = (Math.random() - 0.5) * 20;
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+    origins[i * 3] = (Math.random() - 0.5) * 20;
+    origins[i * 3 + 1] = (Math.random() - 0.5) * 20;
+    origins[i * 3 + 2] = (Math.random() - 0.5) * 10;
+    positions[i * 3] = origins[i * 3];
+    positions[i * 3 + 1] = origins[i * 3 + 1];
+    positions[i * 3 + 2] = origins[i * 3 + 2];
     sizes[i] = Math.random() * 3 + 1;
     speeds[i] = Math.random() * 0.5 + 0.1;
   }
 
-  return { positions, sizes, speeds };
+  return { positions, origins, sizes, speeds };
 }
 
 function Particles({ count = 80 }: { count?: number }) {
@@ -42,8 +36,9 @@ function Particles({ count = 80 }: { count?: number }) {
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      positions[i3 + 1] += Math.sin(time * particles.speeds[i] + i) * 0.002;
-      positions[i3] += Math.cos(time * particles.speeds[i] * 0.5 + i) * 0.001;
+      // Always offset from the origin. Incrementing position every frame causes particles to drift away.
+      positions[i3 + 1] = particles.origins[i3 + 1] + Math.sin(time * particles.speeds[i] + i) * 0.25;
+      positions[i3] = particles.origins[i3] + Math.cos(time * particles.speeds[i] * 0.5 + i) * 0.12;
     }
 
     mesh.current.geometry.attributes.position.needsUpdate = true;
@@ -115,16 +110,43 @@ function FloatingShapes() {
 }
 
 export default function ParticleField() {
-  const isMounted = useIsMounted();
+  const heroVisibleRef = useRef(true);
+  const [isActive, setIsActive] = useState(true);
 
-  if (!isMounted) return null;
+  useEffect(() => {
+    const hero = document.getElementById("hero");
+    const updateActivity = () => {
+      setIsActive(heroVisibleRef.current && document.visibilityState === "visible");
+    };
+    if (!hero || !("IntersectionObserver" in window)) {
+      updateActivity();
+      document.addEventListener("visibilitychange", updateActivity);
+      return () => document.removeEventListener("visibilitychange", updateActivity);
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      heroVisibleRef.current = entry.isIntersecting;
+      updateActivity();
+    });
+
+    observer.observe(hero);
+    document.addEventListener("visibilitychange", updateActivity);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", updateActivity);
+    };
+  }, []);
 
   return (
-    <div className="absolute inset-0 z-0">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-0"
+    >
       <Canvas
         camera={{ position: [0, 0, 6], fov: 60 }}
         style={{ background: "transparent" }}
         dpr={[1, 1.5]}
+        frameloop={isActive ? "always" : "never"}
       >
         <Particles count={80} />
         <FloatingShapes />

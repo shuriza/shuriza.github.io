@@ -1,15 +1,21 @@
 import AdminNav from "@/app/admin/AdminNav";
 import { updateProfile } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
-import { fallbackProfile, getProfile } from "@/lib/profile";
+import { parseEditableProfile } from "@/lib/profile";
 
 export default async function AdminProfilePage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; saved?: string }>;
 }) {
-  const { user } = await requireAdmin();
-  const [profile, params] = await Promise.all([getProfile(), searchParams]);
+  const { supabase, user } = await requireAdmin();
+  const [{ data, error: profileError }, params] = await Promise.all([
+    supabase.from("profile").select("*").eq("id", 1).maybeSingle(),
+    searchParams,
+  ]);
+  const profile = data ? parseEditableProfile(data) : null;
+
+  if (profileError) console.error("[admin] gagal memuat profile:", profileError);
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] px-6 py-10 text-slate-200">
@@ -23,41 +29,53 @@ export default async function AdminProfilePage({
           <AdminNav active="/admin/profile" />
         </header>
 
-        {params.saved && <p className="mb-5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">Profile berhasil disimpan.</p>}
-        {params.error && <p className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{params.error}</p>}
+        {params.saved && <p role="status" className="mb-5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">Profile berhasil disimpan.</p>}
+        {params.error && <p role="alert" className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{params.error}</p>}
 
+        {!profile ? (
+          <section role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-red-200">
+            <h2 className="font-semibold text-white">Profile tidak dapat dimuat</h2>
+            <p className="mt-2 text-sm leading-relaxed">
+              {profileError
+                ? "Periksa koneksi dan konfigurasi Supabase."
+                : "Pastikan migration terbaru sudah dijalankan dan baris profile dengan ID 1 tersedia."}{" "}
+              Lalu muat ulang halaman. Form dinonaktifkan agar data yang tidak lengkap tidak
+              menimpa database.
+            </p>
+          </section>
+        ) : (
         <form action={updateProfile} className="space-y-8 rounded-xl border border-[#334155] bg-[#0f172a] p-6 sm:p-8">
           <section>
             <h2 className="mb-5 text-lg font-semibold text-white">Identitas</h2>
             <div className="grid gap-6 sm:grid-cols-2">
-              <label className="block text-sm text-slate-300">Nama lengkap<input name="display_name" required defaultValue={profile.display_name || fallbackProfile.display_name} className="admin-input" /></label>
-              <label className="block text-sm text-slate-300">Nama singkat<input name="short_name" required defaultValue={profile.short_name || fallbackProfile.short_name} className="admin-input" /></label>
-              <label className="block text-sm text-slate-300">Role<input name="role" required defaultValue={profile.role || fallbackProfile.role} className="admin-input" /></label>
-              <label className="block text-sm text-slate-300">Status<input name="status" required defaultValue={profile.status || fallbackProfile.status} className="admin-input" /></label>
-              <label className="block text-sm text-slate-300">Lokasi<input name="location" required defaultValue={profile.location || fallbackProfile.location} className="admin-input" /></label>
-              <label className="block text-sm text-slate-300">Focus<input name="focus" required defaultValue={profile.focus || fallbackProfile.focus} className="admin-input" /></label>
-              <label className="block text-sm text-slate-300 sm:col-span-2">Pendidikan<input name="education" required defaultValue={profile.education || fallbackProfile.education} className="admin-input" /></label>
+              <label className="block text-sm text-slate-300">Nama lengkap<input name="display_name" required defaultValue={profile.display_name} className="admin-input" /></label>
+              <label className="block text-sm text-slate-300">Nama singkat<input name="short_name" required defaultValue={profile.short_name} className="admin-input" /></label>
+              <label className="block text-sm text-slate-300">Role<input name="role" required defaultValue={profile.role} className="admin-input" /></label>
+              <label className="block text-sm text-slate-300">Status<input name="status" required defaultValue={profile.status} className="admin-input" /></label>
+              <label className="block text-sm text-slate-300">Lokasi<input name="location" required defaultValue={profile.location} className="admin-input" /></label>
+              <label className="block text-sm text-slate-300">Focus<input name="focus" required defaultValue={profile.focus} className="admin-input" /></label>
+              <label className="block text-sm text-slate-300 sm:col-span-2">Pendidikan<input name="education" required defaultValue={profile.education} className="admin-input" /></label>
             </div>
           </section>
 
           <section>
             <h2 className="mb-5 text-lg font-semibold text-white">About</h2>
             <div className="space-y-5">
-              <label className="block text-sm text-slate-300">Bio utama<textarea name="bio_primary" required rows={4} defaultValue={profile.bio_primary || fallbackProfile.bio_primary} className="admin-input resize-y" /></label>
-              <label className="block text-sm text-slate-300">Bio tambahan<textarea name="bio_secondary" required rows={4} defaultValue={profile.bio_secondary || fallbackProfile.bio_secondary} className="admin-input resize-y" /></label>
+              <label className="block text-sm text-slate-300">Bio utama<textarea name="bio_primary" required rows={4} defaultValue={profile.bio_primary} className="admin-input resize-y" /></label>
+              <label className="block text-sm text-slate-300">Bio tambahan<textarea name="bio_secondary" required rows={4} defaultValue={profile.bio_secondary} className="admin-input resize-y" /></label>
             </div>
           </section>
 
           <section>
             <h2 className="mb-5 text-lg font-semibold text-white">Hero & Kontak</h2>
             <div className="space-y-5">
-              <label className="block text-sm text-slate-300">Hero description<textarea name="hero_description" required rows={3} defaultValue={profile.hero_description || fallbackProfile.hero_description} className="admin-input resize-y" /></label>
+              <label className="block text-sm text-slate-300">Hero description<textarea name="hero_description" required rows={3} defaultValue={profile.hero_description} className="admin-input resize-y" /></label>
               <label className="block text-sm text-slate-300">Hero roles <span className="text-slate-500">(satu role per baris)</span><textarea name="hero_roles" required rows={5} defaultValue={profile.hero_roles.join("\n")} className="admin-input resize-y" /></label>
               <div className="grid gap-6 sm:grid-cols-2">
-                <label className="block text-sm text-slate-300">Email<input name="email" type="email" required defaultValue={profile.email || fallbackProfile.email} className="admin-input" /></label>
-                <label className="block text-sm text-slate-300">Website URL<input name="website" type="url" required defaultValue={profile.website || fallbackProfile.website} className="admin-input" /></label>
-                <label className="block text-sm text-slate-300">GitHub URL<input name="github" type="url" required defaultValue={profile.github || fallbackProfile.github} className="admin-input" /></label>
-                <label className="block text-sm text-slate-300">LinkedIn URL<input name="linkedin" type="url" required defaultValue={profile.linkedin || fallbackProfile.linkedin} className="admin-input" /></label>
+                <label className="block text-sm text-slate-300">Email<input name="email" type="email" required defaultValue={profile.email} className="admin-input" /></label>
+                <label className="block text-sm text-slate-300">Website URL<input name="website" type="url" required defaultValue={profile.website} className="admin-input" /></label>
+                <label className="block text-sm text-slate-300">GitHub URL<input name="github" type="url" required defaultValue={profile.github} className="admin-input" /></label>
+                <label className="block text-sm text-slate-300">LinkedIn URL<input name="linkedin" type="url" required defaultValue={profile.linkedin} className="admin-input" /></label>
               </div>
             </div>
           </section>
@@ -69,8 +87,8 @@ export default async function AdminProfilePage({
               otomatis dari menu Skills dan Projects.
             </p>
             <div className="space-y-5">
-              <label className="block text-sm text-slate-300">Headline CV<input name="cv_headline" required defaultValue={profile.cv_headline || fallbackProfile.cv_headline} className="admin-input" /></label>
-              <label className="block text-sm text-slate-300">Ringkasan CV<textarea name="cv_summary" required rows={4} defaultValue={profile.cv_summary || fallbackProfile.cv_summary} className="admin-input resize-y" /></label>
+              <label className="block text-sm text-slate-300">Headline CV<input name="cv_headline" required defaultValue={profile.cv_headline} className="admin-input" /></label>
+              <label className="block text-sm text-slate-300">Ringkasan CV<textarea name="cv_summary" required rows={4} defaultValue={profile.cv_summary} className="admin-input resize-y" /></label>
               <label className="block text-sm text-slate-300">Soft skills <span className="text-slate-500">(satu per baris)</span><textarea name="soft_skills" rows={4} defaultValue={profile.soft_skills.join("\n")} className="admin-input resize-y" /></label>
               <label className="block text-sm text-slate-300">Bahasa <span className="text-slate-500">(satu per baris, format: Nama | Level)</span><textarea name="languages" rows={3} defaultValue={profile.languages.map((language) => `${language.name} | ${language.level}`).join("\n")} className="admin-input resize-y" /></label>
             </div>
@@ -78,6 +96,7 @@ export default async function AdminProfilePage({
 
           <button className="rounded-lg bg-cyan-500 px-5 py-3 font-semibold text-[#0a0a0f] hover:bg-cyan-400">Simpan profile</button>
         </form>
+        )}
       </div>
     </main>
   );

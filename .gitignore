@@ -39,6 +39,12 @@ yarn-error.log*
 # agent config
 AGENTS.md
 CLAUDE.md
+/.slim/deepwork/
+/.ignore
+/.opencode-context.md
+/.opencode-jce/
+/.playwright-mcp/
+/opencode.json
 
 # typescript
 *.tsbuildinfo

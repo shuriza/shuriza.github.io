@@ -20,7 +20,7 @@ export default async function AdminSettingsPage({
     searchParams,
   ]);
 
-  const settings = resolveSettings(data);
+  const settings = data ? resolveSettings(data) : null;
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] px-6 py-10 text-slate-200">
@@ -35,24 +35,28 @@ export default async function AdminSettingsPage({
         </header>
 
         {params.saved && (
-          <p className="mb-5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+          <p role="status" className="mb-5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
             Pengaturan berhasil disimpan.
           </p>
         )}
         {params.error && (
-          <p className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <p role="alert" className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
             {params.error}
           </p>
         )}
-        {error && (
-          <p className="mb-5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-            Tabel <code>site_settings</code> belum tersedia ({error.message}). Jalankan{" "}
-            <code>supabase/upgrade.sql</code> di SQL Editor, lalu muat ulang halaman ini.
-            Sementara itu semua fitur dianggap aktif.
-          </p>
-        )}
-
-        <form
+        {!settings ? (
+          <section role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-red-200">
+            <h2 className="font-semibold text-white">Pengaturan tidak dapat dimuat</h2>
+            <p className="mt-2 text-sm leading-relaxed">
+              {error
+                ? "Periksa koneksi dan konfigurasi Supabase."
+                : "Pastikan baris site_settings dengan ID 1 tersedia."}{" "}
+              Jalankan <code>supabase/upgrade.sql</code> bila perlu, lalu muat ulang halaman.
+              Form dinonaktifkan untuk mencegah nilai default menimpa database.
+            </p>
+          </section>
+        ) : (
+          <form
           action={updateSettings}
           className="rounded-xl border border-[#334155] bg-[#0f172a] p-6 sm:p-8"
         >
@@ -85,7 +89,8 @@ export default async function AdminSettingsPage({
           <button className="mt-6 rounded-lg bg-cyan-500 px-5 py-3 font-semibold text-[#0a0a0f] hover:bg-cyan-400">
             Simpan pengaturan
           </button>
-        </form>
+          </form>
+        )}
       </div>
     </main>
   );
