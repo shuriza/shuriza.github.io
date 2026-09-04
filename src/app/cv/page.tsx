@@ -81,6 +81,45 @@ export default async function CVPage() {
           </p>
         </Section>
 
+        <Section title="Experience">
+          <div className="cv-item">
+            <h3 className="text-base font-semibold text-white">
+              Praktik Kerja Lapangan (PKL) - Digital Marketing
+            </h3>
+            <p className="mt-1 text-sm leading-relaxed text-slate-300">
+              Membantu kegiatan pemasaran digital melalui pengelolaan media sosial,
+              pembuatan konten, input data, dan dukungan pada iklan digital.
+            </p>
+          </div>
+        </Section>
+
+        <Section title="Education">
+          <div className="space-y-5">
+            <div className="cv-item">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <h3 className="text-base font-semibold text-white">
+                  D3 Manajemen Informatika
+                </h3>
+                <span className="text-xs text-slate-400">2023 - 2026</span>
+              </div>
+              <p className="mt-1 text-sm text-cyan-400">Politeknik Negeri Malang</p>
+              <p className="mt-1 text-sm leading-relaxed text-slate-300">
+                Mempelajari pengembangan perangkat lunak, basis data, analisis sistem,
+                dan pengembangan aplikasi web.
+              </p>
+            </div>
+            <div className="cv-item">
+              <h3 className="text-base font-semibold text-white">
+                Rekayasa Perangkat Lunak (RPL)
+              </h3>
+              <p className="mt-1 text-sm leading-relaxed text-slate-300">
+                Mempelajari dasar pemrograman dan pengembangan perangkat lunak,
+                terutama melalui latihan aplikasi Java menggunakan NetBeans.
+              </p>
+            </div>
+          </div>
+        </Section>
+
         {skillGroups.length > 0 && (
           <Section title="Technical Skills">
             <div className="space-y-4">

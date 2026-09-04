@@ -46,8 +46,8 @@ export const fallbackProfile: Profile = {
   status: "Open to work",
   email: "firdausmfirdaus657@gmail.com",
   github: "https://github.com/shuriza",
-  linkedin: "https://linkedin.com/in/shuriza",
-  website: "https://shuriza.me",
+  linkedin: "https://www.linkedin.com/in/m-firdaus-suryaningrat-73a471338/",
+  website: "https://shuriza.tech",
   hero_roles: [
     "I build modern web apps",
     "I craft clean & scalable code",
@@ -56,9 +56,9 @@ export const fallbackProfile: Profile = {
   ],
   hero_description:
     "Saya membangun aplikasi web yang rapi, cepat, dan siap dipakai menggunakan React, Next.js, dan Laravel.",
-  cv_headline: "Fullstack Web Developer",
+  cv_headline: "Junior Fullstack Web Developer",
   cv_summary:
-    "Fullstack web developer dengan fokus pada pengembangan web modern: React/Next.js untuk frontend dan Laravel untuk backend. Terbiasa membangun aplikasi produksi end-to-end — dari desain database, REST API, integrasi layanan pihak ketiga, hingga deployment. Terbuka untuk peluang freelance, kontrak, dan full-time.",
+    "Lulusan D3 Manajemen Informatika dengan dasar Rekayasa Perangkat Lunak sejak SMK. Memiliki pengalaman mengerjakan proyek web menggunakan Laravel, PHP, MySQL, React, Next.js, dan TypeScript. Memiliki ketertarikan pada perkembangan Artificial Intelligence (AI).",
   soft_skills: ["Self-learning", "Problem Solving", "Team Collaboration", "Time Management"],
   languages: [
     { name: "Bahasa Indonesia", level: "Native" },
@@ -96,13 +96,25 @@ export const getProfile = cache(async (): Promise<Profile> => {
   }
 
   const merged = { ...fallbackProfile, ...data } as Profile;
+  const usesLegacySummary =
+    !merged.cv_summary ||
+    merged.cv_summary.startsWith("Mahasiswa D3") ||
+    merged.cv_summary.startsWith("Fullstack web developer dengan fokus pada pengembangan web modern:");
 
   // Kolom CV baru mungkin belum ada jika migration terakhir belum dijalankan,
   // jadi setiap field di-resolve satu per satu dengan fallback yang aman.
   return {
     ...merged,
-    cv_headline: merged.cv_headline || merged.role || fallbackProfile.cv_headline,
-    cv_summary: merged.cv_summary || fallbackProfile.cv_summary,
+    linkedin:
+      merged.linkedin === "https://linkedin.com/in/shuriza"
+        ? fallbackProfile.linkedin
+        : merged.linkedin,
+    website: merged.website === "https://shuriza.me" ? fallbackProfile.website : merged.website,
+    cv_headline:
+      !merged.cv_headline || merged.cv_headline === "Fullstack Web Developer"
+        ? fallbackProfile.cv_headline
+        : merged.cv_headline,
+    cv_summary: usesLegacySummary ? fallbackProfile.cv_summary : merged.cv_summary,
     soft_skills: Array.isArray(data.soft_skills)
       ? data.soft_skills.map((item: unknown) => String(item))
       : fallbackProfile.soft_skills,

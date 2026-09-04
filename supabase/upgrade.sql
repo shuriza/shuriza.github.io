@@ -80,11 +80,17 @@ values (
   'Dengan pengalaman di React, Next.js, Laravel, dan berbagai teknologi web modern, saya selalu berusaha menciptakan solusi digital yang memberikan dampak nyata.',
   'Kediri, Jawa Timur', 'Fullstack Web', 'Informatics Eng.', 'Open to work',
   'firdausmfirdaus657@gmail.com', 'https://github.com/shuriza',
-  'https://linkedin.com/in/shuriza', 'https://shuriza.me',
+  'https://www.linkedin.com/in/m-firdaus-suryaningrat-73a471338/', 'https://shuriza.tech',
   array['I build modern web apps', 'I craft clean & scalable code', 'I turn ideas into reality', 'I love React & Laravel'],
   'Saya membangun aplikasi web yang rapi, cepat, dan siap dipakai menggunakan React, Next.js, dan Laravel.'
 )
 on conflict (id) do nothing;
+
+update public.profile
+set
+  linkedin = 'https://www.linkedin.com/in/m-firdaus-suryaningrat-73a471338/',
+  website = 'https://shuriza.tech'
+where id = 1;
 
 insert into public.skills (name, category, icon, color, sort_order)
 select * from (values
@@ -108,14 +114,22 @@ alter table public.profile add column if not exists cv_summary text not null def
 alter table public.profile add column if not exists soft_skills text[] not null default '{}';
 alter table public.profile add column if not exists languages jsonb not null default '[]'::jsonb;
 
--- Section Education dihapus dari CV; kolomnya ikut dibuang agar tidak jadi data mati.
+-- Data pendidikan tetap statis di halaman CV; kolom legacy ini tidak lagi digunakan.
 alter table public.profile drop column if exists cv_education;
+
+update public.profile
+set cv_headline = 'Junior Fullstack Web Developer'
+where id = 1 and (cv_headline = '' or cv_headline = 'Fullstack Web Developer');
 
 -- Timpa ringkasan lama bergaya mahasiswa hanya jika masih boilerplate default,
 -- supaya ringkasan yang sudah diedit manual lewat admin tidak ikut tertimpa.
 update public.profile
-set cv_summary = 'Fullstack web developer dengan fokus pada pengembangan web modern: React/Next.js untuk frontend dan Laravel untuk backend. Terbiasa membangun aplikasi produksi end-to-end — dari desain database, REST API, integrasi layanan pihak ketiga, hingga deployment. Terbuka untuk peluang freelance, kontrak, dan full-time.'
-where id = 1 and cv_summary like 'Mahasiswa D3%';
+set cv_summary = 'Lulusan D3 Manajemen Informatika dengan dasar Rekayasa Perangkat Lunak sejak SMK. Memiliki pengalaman mengerjakan proyek web menggunakan Laravel, PHP, MySQL, React, Next.js, dan TypeScript. Memiliki ketertarikan pada perkembangan Artificial Intelligence (AI).'
+where id = 1 and (
+  cv_summary = ''
+  or cv_summary like 'Mahasiswa D3%'
+  or cv_summary like 'Fullstack web developer dengan fokus pada pengembangan web modern:%'
+);
 
 -- Isi awal field CV dari data profile yang sudah ada.
 update public.profile
@@ -123,7 +137,7 @@ set
   cv_headline = coalesce(nullif(cv_headline, ''), role),
   cv_summary = coalesce(
     nullif(cv_summary, ''),
-    'Fullstack web developer dengan fokus pada pengembangan web modern: React/Next.js untuk frontend dan Laravel untuk backend. Terbiasa membangun aplikasi produksi end-to-end — dari desain database, REST API, integrasi layanan pihak ketiga, hingga deployment. Terbuka untuk peluang freelance, kontrak, dan full-time.'
+    'Lulusan D3 Manajemen Informatika dengan dasar Rekayasa Perangkat Lunak sejak SMK. Memiliki pengalaman mengerjakan proyek web menggunakan Laravel, PHP, MySQL, React, Next.js, dan TypeScript. Memiliki ketertarikan pada perkembangan Artificial Intelligence (AI).'
   ),
   soft_skills = case
     when coalesce(cardinality(soft_skills), 0) = 0
