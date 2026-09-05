@@ -2,8 +2,9 @@
 
 Personal portfolio website with 3D particle animations, animated terminal, and modern UI.
 
-**Live:** [portofolio-gilt-zeta-13.vercel.app](https://portofolio-gilt-zeta-13.vercel.app)
+**Live:** [shuriza.tech](https://shuriza.tech)
 
+[![CI](https://github.com/shuriza/shuriza.github.io/actions/workflows/ci.yml/badge.svg)](https://github.com/shuriza/shuriza.github.io/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB)
 ![Three.js](https://img.shields.io/badge/Three.js-000000?style=flat-square&logo=threedotjs&logoColor=white)

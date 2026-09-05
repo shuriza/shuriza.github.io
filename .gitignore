@@ -46,6 +46,9 @@ CLAUDE.md
 /.playwright-mcp/
 /opencode.json
 
+# private career notes: job strategy, personal contact details, project plans
+/docs/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
