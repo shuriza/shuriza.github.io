@@ -188,7 +188,7 @@ export default async function CVPage() {
         )}
 
         {cvProjects.length > 0 && (
-          <Section title="Project Laravel Pilihan">
+          <Section title="Project Pilihan">
             <div className="space-y-5">
               {cvProjects.map((project) => (
                 <div key={project.id} className="cv-item">
