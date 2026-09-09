@@ -19,6 +19,7 @@ Personal portfolio website with 3D particle animations, animated terminal, and m
 - Scroll-triggered section animations (Framer Motion)
 - Responsive design with mobile hamburger menu
 - Dark theme with cyan accent
+- Certificate and course-completion evidence with direct document links
 
 ## Tech Stack
 
@@ -98,9 +99,8 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-Saat environment Supabase belum diisi, halaman publik tetap menampilkan seed
-`Shuriza Store` sebagai fallback. CRUD admin baru aktif setelah konfigurasi
-Supabase selesai.
+Saat environment Supabase belum diisi, halaman publik tetap menampilkan project
+portfolio sebagai fallback. CRUD admin baru aktif setelah konfigurasi Supabase selesai.
 
 ## License
 

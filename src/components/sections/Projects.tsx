@@ -12,7 +12,7 @@ function ProjectCard({ project }: { project: Project }) {
       <div className="p-6">
         {project.featured && (
           <span className="mb-4 inline-block rounded-full border border-cyan-500/30 px-3 py-1 text-xs text-cyan-400">
-            Featured Project
+            Project Unggulan
           </span>
         )}
 
@@ -73,8 +73,11 @@ export default function Projects({ projects }: { projects: Project[] }) {
 
       <div className="relative mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Projects</h2>
-          <p className="mx-auto max-w-lg text-slate-400">Some of the projects I&apos;ve built and contributed to</p>
+          <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">Project Pilihan</h2>
+          <p className="mx-auto max-w-2xl text-slate-400">
+            Aplikasi yang saya rancang dan bangun untuk kebutuhan operasional, akademik,
+            bisnis, dan eksplorasi antarmuka web.
+          </p>
         </div>
 
         <ul className="grid gap-6 md:grid-cols-2">

@@ -4,6 +4,7 @@ import Hero from "@/components/sections/Hero";
 import About from "@/components/sections/About";
 import Skills from "@/components/sections/Skills";
 import Projects from "@/components/sections/Projects";
+import Certificates from "@/components/sections/Certificates";
 import Contact from "@/components/sections/Contact";
 import Footer from "@/components/Footer";
 import { getPublishedProjects } from "@/lib/projects";
@@ -63,6 +64,7 @@ export default async function Home() {
         {settings.about_enabled && <About profile={profile} />}
         {settings.skills_enabled && <Skills skills={skills} />}
         {settings.projects_enabled && <Projects projects={projects} />}
+        <Certificates />
         {settings.contact_enabled && (
           <Contact profile={profile} showCvLink={settings.cv_enabled} />
         )}

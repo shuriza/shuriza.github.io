@@ -100,6 +100,53 @@ update public.profile
 set display_name = 'M. Firdaus Suryaningrat'
 where id = 1 and btrim(display_name) in ('', '-');
 
+update public.profile
+set
+  role = 'Junior Laravel Developer',
+  status = 'Terbuka untuk Magang',
+  location = 'Kediri, Jawa Timur',
+  focus = 'Laravel & API Integration',
+  education = 'D3 Manajemen Informatika · IPK 3,63',
+  bio_primary = 'Lulusan D3 Manajemen Informatika dengan fokus pada pengembangan aplikasi web berbasis Laravel, PHP, MySQL, dan integrasi API.',
+  bio_secondary = 'Saya mengembangkan sistem rekap absensi untuk DPMPTSP Kota Kediri serta aplikasi manajemen tugas yang terintegrasi Google Classroom, Gemini AI, dan Telegram Bot.',
+  hero_description = 'Junior Laravel Developer dengan pengalaman membangun aplikasi operasional, integrasi API, autentikasi, dan laporan berbasis data.',
+  hero_roles = array['Laravel 12 · PHP · MySQL', 'REST API · OAuth · AI Integration', 'Blade · Alpine.js · Tailwind CSS']
+where id = 1;
+
+update public.projects
+set
+  description = case title
+    when 'Todo AI' then 'Aplikasi manajemen tugas Laravel dengan Matriks Eisenhower, Google Classroom, Gemini AI, Google OAuth, Telegram Bot dua arah, kalender, dan laporan analitik.'
+    when 'Sistem Rekap Absensi DPMPTSP' then 'Sistem Laravel untuk impor dan validasi data absensi, pengelolaan izin, dashboard analitik, serta laporan bulanan dan tahunan dalam format Excel dan PDF.'
+    when 'Kandangan Fresh' then 'Marketplace Laravel untuk petani bawang merah dengan katalog, role admin dan pelanggan, Google OAuth, pembayaran Midtrans, invoice PDF, dan laporan penjualan.'
+    when 'Shuriza Store' then 'E-commerce platform with product catalog, shopping cart, and order management system.'
+    else description
+  end,
+  demo = case when title = 'Todo AI' then null else demo end
+where title in ('Todo AI', 'Sistem Rekap Absensi DPMPTSP', 'Kandangan Fresh', 'Shuriza Store');
+
+insert into public.projects (
+  title, description, tech, github, demo, featured, published, sort_order
+)
+select seed.*
+from (values
+  (
+    'CosplayNesia',
+    'Masih dalam pengembangan — marketplace penyewaan dan pembelian kostum cosplay dengan checkout atomik, reservasi sewa, fulfillment multi-penjual, dan ulasan pembeli terverifikasi.',
+    array['Laravel 13', 'PHP', 'SQLite', 'Blade', 'JavaScript']::text[],
+    'https://github.com/shuriza/CosplayNesia', null::text, false, true, 4
+  ),
+  (
+    'Focus Tracker',
+    'Masih dalam pengembangan — pencatat durasi browsing dan pemblokir distraksi melalui ekstensi Chrome, sinkronisasi Supabase, aturan kuota domain, dan dashboard analitik tujuh hari.',
+    array['Next.js 16', 'TypeScript', 'Supabase', 'Chrome Extension MV3', 'Recharts']::text[],
+    'https://github.com/shuriza/focus-tracker', null::text, false, true, 5
+  )
+) as seed(title, description, tech, github, demo, featured, published, sort_order)
+where not exists (
+  select 1 from public.projects existing where existing.title = seed.title
+);
+
 insert into public.skills (name, category, icon, color, sort_order)
 select * from (values
   ('React', 'Frontend', 'SiReact', '#61DAFB', 0), ('Next.js', 'Frontend', 'SiNextdotjs', '#ffffff', 1),
@@ -121,6 +168,14 @@ alter table public.profile add column if not exists cv_headline text not null de
 alter table public.profile add column if not exists cv_summary text not null default '';
 alter table public.profile add column if not exists soft_skills text[] not null default '{}';
 alter table public.profile add column if not exists languages jsonb not null default '[]'::jsonb;
+
+update public.profile
+set
+  cv_headline = 'Junior Laravel Developer',
+  cv_summary = 'Lulusan D3 Manajemen Informatika Politeknik Negeri Malang dengan IPK 3,63 dan dasar Rekayasa Perangkat Lunak. Berpengalaman membangun aplikasi Laravel 11/12 berbasis MySQL untuk kebutuhan instansi dan akademik, termasuk REST API, Google OAuth, integrasi Gemini dan Telegram, serta laporan Excel/PDF.',
+  soft_skills = array['Problem Solving', 'Kolaborasi Tim', 'Komunikasi', 'Manajemen Waktu'],
+  languages = '[{"name":"Bahasa Indonesia","level":"Native"},{"name":"English","level":"Basic"}]'::jsonb
+where id = 1;
 
 -- Data pendidikan tetap statis di halaman CV; kolom legacy ini tidak lagi digunakan.
 alter table public.profile drop column if exists cv_education;

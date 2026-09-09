@@ -5,6 +5,7 @@ import {
   HiOutlineMail,
   HiOutlineLocationMarker,
   HiOutlineArrowLeft,
+  HiOutlinePhone,
 } from "react-icons/hi";
 import { FaGithub, FaGlobe, FaLinkedin } from "react-icons/fa";
 import PrintButton from "./PrintButton";
@@ -12,7 +13,9 @@ import { getProfile, type Profile } from "@/lib/profile";
 import { getPublishedProjects } from "@/lib/projects";
 import { getPublishedSkills } from "@/lib/skills-server";
 import { getSiteSettings } from "@/lib/settings-server";
-import { SKILL_CATEGORIES } from "@/lib/skills";
+import { certifications } from "@/lib/certificates";
+
+const PHONE_NUMBER = "0817-7509-3906";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [profile, settings] = await Promise.all([getProfile(), getSiteSettings()]);
@@ -70,10 +73,17 @@ export default async function CVPage() {
     getPublishedSkills(),
   ]);
 
-  const skillGroups = SKILL_CATEGORIES.map((category) => ({
+  const skillGroups = ["Backend", "Frontend", "Tools"].map((category) => ({
     title: category,
     items: skills.filter((skill) => skill.category === category),
   })).filter((group) => group.items.length > 0);
+  const cvProjects = projects
+    .filter(
+      (project) =>
+        project.title === "Shuriza Store" ||
+        project.tech.some((technology) => technology.startsWith("Laravel")),
+    )
+    .slice(0, 4);
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] py-10 px-4 sm:px-6 cv-root">
@@ -95,57 +105,72 @@ export default async function CVPage() {
       <article className="cv-document max-w-4xl mx-auto bg-[#0f172a] border border-[#334155] rounded-2xl p-8 sm:p-12 shadow-2xl">
         <CvHeader profile={profile} />
 
-        <Section title="Profile">
+        <Section title="Profil Profesional">
           <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
             {profile.cv_summary}
           </p>
         </Section>
 
-        <Section title="Experience">
+        <Section title="Pengalaman">
           <div className="cv-item">
-            <h3 className="text-base font-semibold text-white">
-              Praktik Kerja Lapangan (PKL) - Digital Marketing
-            </h3>
-            <p className="mt-1 text-sm leading-relaxed text-slate-300">
-              Membantu kegiatan pemasaran digital melalui pengelolaan media sosial,
-              pembuatan konten, input data, dan dukungan pada iklan digital.
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+              <h3 className="text-base font-semibold text-white">
+                Mahasiswa Magang - Pengembangan Aplikasi Web
+              </h3>
+              <span className="text-xs text-slate-400">Juni 2025 - Agustus 2025</span>
+            </div>
+            <p className="mt-1 text-sm font-medium text-cyan-400">
+              DPMPTSP Kota Kediri · Kota Kediri, Jawa Timur
             </p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-300">
+              <li>
+                Mengembangkan sistem rekap absensi internal berbasis Laravel 12 dan MySQL
+                untuk membantu pengolahan data kehadiran pegawai.
+              </li>
+              <li>
+                Mengimplementasikan impor dan validasi Excel, izin presensi, dashboard
+                analitik, serta laporan bulanan dan tahunan dalam format Excel dan PDF.
+              </li>
+            </ul>
           </div>
         </Section>
 
-        <Section title="Education">
+        <Section title="Pendidikan">
           <div className="space-y-5">
             <div className="cv-item">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3">
                 <h3 className="text-base font-semibold text-white">
                   D3 Manajemen Informatika
                 </h3>
-                <span className="text-xs text-slate-400">2023 - 2026</span>
+                <span className="text-xs text-slate-400">2023 - 2026 · IPK 3,63</span>
               </div>
               <p className="mt-1 text-sm text-cyan-400">Politeknik Negeri Malang</p>
               <p className="mt-1 text-sm leading-relaxed text-slate-300">
-                Mempelajari pengembangan perangkat lunak, basis data, analisis sistem,
-                dan pengembangan aplikasi web.
+                Fokus pada pengembangan perangkat lunak, basis data, analisis sistem,
+                dan manajemen proyek.
               </p>
             </div>
             <div className="cv-item">
-              <h3 className="text-base font-semibold text-white">
-                Rekayasa Perangkat Lunak (RPL)
-              </h3>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                <h3 className="text-base font-semibold text-white">
+                  Rekayasa Perangkat Lunak (RPL)
+                </h3>
+                <span className="text-xs text-slate-400">2020 - 2023</span>
+              </div>
+              <p className="mt-1 text-sm text-cyan-400">SMKN 1 Kertosono</p>
               <p className="mt-1 text-sm leading-relaxed text-slate-300">
-                Mempelajari dasar pemrograman dan pengembangan perangkat lunak,
-                terutama melalui latihan aplikasi Java menggunakan NetBeans.
+                Mempelajari dasar pemrograman dan pengembangan perangkat lunak dengan Java.
               </p>
             </div>
           </div>
         </Section>
 
         {skillGroups.length > 0 && (
-          <Section title="Technical Skills">
-            <div className="space-y-4">
+          <Section title="Keahlian Teknis">
+            <div className="space-y-2">
               {skillGroups.map((group) => (
                 <div key={group.title} className="cv-item">
-                  <p className="text-sm font-semibold text-cyan-400 mb-2">{group.title}</p>
+                  <p className="mb-1 text-sm font-semibold text-cyan-400">{group.title}</p>
                   <div className="flex flex-wrap gap-2">
                     {group.items.map((skill) => (
                       <span
@@ -162,10 +187,10 @@ export default async function CVPage() {
           </Section>
         )}
 
-        {projects.length > 0 && (
-          <Section title="Projects">
+        {cvProjects.length > 0 && (
+          <Section title="Project Laravel Pilihan">
             <div className="space-y-5">
-              {projects.map((project) => (
+              {cvProjects.map((project) => (
                 <div key={project.id} className="cv-item">
                   <div className="flex flex-wrap items-baseline gap-x-3">
                     <h3 className="text-base font-semibold text-white">{project.title}</h3>
@@ -212,10 +237,27 @@ export default async function CVPage() {
           </Section>
         )}
 
+        <Section title="Sertifikasi">
+          <div className="space-y-3">
+            {certifications.filter((certification) => certification.showOnCv).map((certification) => (
+              <div key={certification.name} className="cv-item">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <h3 className="text-sm font-semibold text-white">{certification.name}</h3>
+                  <span className="text-xs text-slate-400">{certification.date}</span>
+                </div>
+                <p className="mt-1 text-xs text-cyan-400">
+                  {certification.issuer}
+                  {certification.credential && " · Credential: " + certification.credential}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Section>
+
         {(profile.soft_skills.length > 0 || profile.languages.length > 0) && (
           <div className="grid sm:grid-cols-2 gap-8 mt-8">
             {profile.soft_skills.length > 0 && (
-              <SubSection title="Soft Skills">
+              <SubSection title="Keterampilan Profesional">
                 <ul className="text-sm text-slate-300 space-y-1.5">
                   {profile.soft_skills.map((skill) => (
                     <li key={skill} className="flex items-center gap-2">
@@ -228,7 +270,7 @@ export default async function CVPage() {
             )}
 
             {profile.languages.length > 0 && (
-              <SubSection title="Languages">
+              <SubSection title="Bahasa">
                 <ul className="text-sm text-slate-300 space-y-1.5">
                   {profile.languages.map((language) => (
                     <li key={language.name} className="flex items-center justify-between">
@@ -277,6 +319,13 @@ function CvHeader({ profile }: { profile: Profile }) {
             <span>{profile.location}</span>
           </span>
           <a
+            href="tel:+6281775093906"
+            className="inline-flex min-w-0 items-center gap-1.5 hover:text-cyan-400 transition-colors"
+          >
+            <HiOutlinePhone size={15} />
+            <span>{PHONE_NUMBER}</span>
+          </a>
+          <a
             href={profile.github}
             target="_blank"
             rel="noopener noreferrer"
@@ -294,7 +343,7 @@ function CvHeader({ profile }: { profile: Profile }) {
             className="inline-flex min-w-0 items-center gap-1.5 hover:text-cyan-400 transition-colors"
           >
             <FaLinkedin size={14} />
-            <span className="break-all">{stripProtocol(profile.linkedin)}</span>
+            <span>LinkedIn</span>
           </a>
           <a
             href={profile.website}

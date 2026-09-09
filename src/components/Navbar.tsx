@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { href: "/#about", label: "About", flag: "about_enabled" },
   { href: "/#skills", label: "Skills", flag: "skills_enabled" },
   { href: "/#projects", label: "Projects", flag: "projects_enabled" },
+  { href: "/#certificates", label: "Certificates", flag: null },
   { href: "/#contact", label: "Contact", flag: "contact_enabled" },
   { href: "/cv", label: "CV", flag: "cv_enabled" },
 ] as const;

@@ -17,16 +17,76 @@ export interface Project {
 
 const fallbackProjects: Project[] = [
   {
+    id: "todo-ai",
+    title: "Todo AI",
+    description:
+      "Aplikasi manajemen tugas Laravel dengan Matriks Eisenhower, Google Classroom, Gemini AI, Google OAuth, Telegram Bot dua arah, kalender, dan laporan analitik.",
+    tech: ["Laravel 12", "PHP", "MySQL", "Gemini API", "Google Classroom API", "Telegram Bot"],
+    github: "https://github.com/shuriza/todos",
+    demo: null,
+    featured: true,
+    published: true,
+    sort_order: 0,
+  },
+  {
+    id: "rekap-absensi-dpmptsp",
+    title: "Sistem Rekap Absensi DPMPTSP",
+    description:
+      "Sistem Laravel untuk impor dan validasi data absensi, pengelolaan izin, dashboard analitik, serta laporan bulanan dan tahunan dalam format Excel dan PDF.",
+    tech: ["Laravel 12", "PHP", "MySQL", "Alpine.js", "Laravel Excel", "DomPDF"],
+    github: "https://github.com/shuriza/rekap_absensi",
+    demo: null,
+    featured: false,
+    published: true,
+    sort_order: 1,
+  },
+  {
+    id: "kandangan-fresh",
+    title: "Kandangan Fresh",
+    description:
+      "Marketplace Laravel untuk petani bawang merah dengan katalog, role admin dan pelanggan, Google OAuth, pembayaran Midtrans, invoice PDF, dan laporan penjualan.",
+    tech: ["Laravel 11", "PHP", "MySQL", "Midtrans", "Laravel Socialite", "DomPDF"],
+    github: "https://github.com/shuriza/bawang",
+    demo: null,
+    featured: false,
+    published: true,
+    sort_order: 2,
+  },
+  {
     id: "shuriza-store",
     title: "Shuriza Store",
     description:
       "E-commerce platform with product catalog, shopping cart, and order management system.",
     tech: ["Next.js", "React", "Tailwind CSS", "TypeScript"],
-    github: null,
-    demo: "https://shurizastore.biz.id/",
-    featured: true,
+    github: "https://github.com/shuriza/shuriza-store",
+    demo: "https://shurizastore.my.id/",
+    featured: false,
     published: true,
-    sort_order: 0,
+    sort_order: 3,
+  },
+  {
+    id: "cosplaynesia",
+    title: "CosplayNesia",
+    description:
+      "Masih dalam pengembangan — marketplace penyewaan dan pembelian kostum cosplay dengan checkout atomik, reservasi sewa, fulfillment multi-penjual, dan ulasan pembeli terverifikasi.",
+    tech: ["Laravel 13", "PHP", "SQLite", "Blade", "JavaScript"],
+    github: "https://github.com/shuriza/CosplayNesia",
+    demo: null,
+    featured: false,
+    published: true,
+    sort_order: 4,
+  },
+  {
+    id: "focus-tracker",
+    title: "Focus Tracker",
+    description:
+      "Masih dalam pengembangan — pencatat durasi browsing dan pemblokir distraksi melalui ekstensi Chrome, sinkronisasi Supabase, aturan kuota domain, dan dashboard analitik tujuh hari.",
+    tech: ["Next.js 16", "TypeScript", "Supabase", "Chrome Extension MV3", "Recharts"],
+    github: "https://github.com/shuriza/focus-tracker",
+    demo: null,
+    featured: false,
+    published: true,
+    sort_order: 5,
   },
 ];
 
