@@ -64,7 +64,7 @@ export const fallbackProfile: Profile = {
   bio_primary:
     "Lulusan D3 Manajemen Informatika dengan fokus pada pengembangan aplikasi web berbasis Laravel, PHP, MySQL, dan integrasi API.",
   bio_secondary:
-    "Saya mengembangkan sistem rekap absensi untuk DPMPTSP Kota Kediri serta aplikasi manajemen tugas yang terintegrasi Google Classroom, Gemini AI, dan Telegram Bot.",
+    "Saya mengembangkan sistem rekap absensi untuk DPMPTSP Kota Kediri serta aplikasi manajemen tugas yang terintegrasi Google Classroom, Gemini AI, dan Telegram Bot. Saya juga tertarik dan sedang mendalami penerapan AI dalam pengembangan aplikasi web.",
   location: "Kediri, Jawa Timur",
   focus: "Laravel & API Integration",
   education: "D3 Manajemen Informatika · IPK 3,63",
@@ -82,7 +82,7 @@ export const fallbackProfile: Profile = {
     "Junior Laravel Developer dengan pengalaman membangun aplikasi operasional, integrasi API, autentikasi, dan laporan berbasis data.",
   cv_headline: "Junior Laravel Developer",
   cv_summary:
-    "Lulusan D3 Manajemen Informatika Politeknik Negeri Malang dengan IPK 3,63 dan dasar Rekayasa Perangkat Lunak. Berpengalaman membangun aplikasi Laravel 11/12 berbasis MySQL untuk kebutuhan instansi dan akademik, termasuk REST API, Google OAuth, integrasi Gemini dan Telegram, serta laporan Excel/PDF.",
+    "Lulusan D3 Manajemen Informatika Politeknik Negeri Malang dengan IPK 3,63 dan dasar Rekayasa Perangkat Lunak. Berpengalaman membangun aplikasi Laravel 11/12 berbasis MySQL untuk kebutuhan instansi dan akademik, termasuk REST API, Google OAuth, integrasi Gemini dan Telegram, serta laporan Excel/PDF. Tertarik dan sedang mendalami penerapan Artificial Intelligence (AI) dalam pengembangan aplikasi web.",
   soft_skills: ["Problem Solving", "Kolaborasi Tim", "Komunikasi", "Manajemen Waktu"],
   languages: [
     { name: "Bahasa Indonesia", level: "Native" },

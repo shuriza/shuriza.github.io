@@ -77,13 +77,19 @@ export default async function CVPage() {
     title: category,
     items: skills.filter((skill) => skill.category === category),
   })).filter((group) => group.items.length > 0);
+  const cvProjectOrder = new Map([
+    ["Todo AI", 0],
+    ["Sistem Rekap Absensi DPMPTSP", 1],
+    ["Kandangan Fresh", 2],
+    ["Shuriza Store", 3],
+  ]);
   const cvProjects = projects
-    .filter(
-      (project) =>
-        project.title === "Shuriza Store" ||
-        project.tech.some((technology) => technology.startsWith("Laravel")),
-    )
-    .slice(0, 4);
+    .filter((project) => cvProjectOrder.has(project.title))
+    .sort(
+      (first, second) =>
+        (cvProjectOrder.get(first.title) ?? Number.MAX_SAFE_INTEGER) -
+        (cvProjectOrder.get(second.title) ?? Number.MAX_SAFE_INTEGER),
+    );
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] py-10 px-4 sm:px-6 cv-root">
@@ -188,8 +194,8 @@ export default async function CVPage() {
         )}
 
         {cvProjects.length > 0 && (
-          <Section title="Project Pilihan">
-            <div className="space-y-5">
+          <Section title="Project Laravel Pilihan">
+            <div className="space-y-4">
               {cvProjects.map((project) => (
                 <div key={project.id} className="cv-item">
                   <div className="flex flex-wrap items-baseline gap-x-3">

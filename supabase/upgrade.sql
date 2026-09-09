@@ -108,7 +108,7 @@ set
   focus = 'Laravel & API Integration',
   education = 'D3 Manajemen Informatika · IPK 3,63',
   bio_primary = 'Lulusan D3 Manajemen Informatika dengan fokus pada pengembangan aplikasi web berbasis Laravel, PHP, MySQL, dan integrasi API.',
-  bio_secondary = 'Saya mengembangkan sistem rekap absensi untuk DPMPTSP Kota Kediri serta aplikasi manajemen tugas yang terintegrasi Google Classroom, Gemini AI, dan Telegram Bot.',
+  bio_secondary = 'Saya mengembangkan sistem rekap absensi untuk DPMPTSP Kota Kediri serta aplikasi manajemen tugas yang terintegrasi Google Classroom, Gemini AI, dan Telegram Bot. Saya juga tertarik dan sedang mendalami penerapan AI dalam pengembangan aplikasi web.',
   hero_description = 'Junior Laravel Developer dengan pengalaman membangun aplikasi operasional, integrasi API, autentikasi, dan laporan berbasis data.',
   hero_roles = array['Laravel 12 · PHP · MySQL', 'REST API · OAuth · AI Integration', 'Blade · Alpine.js · Tailwind CSS']
 where id = 1;
@@ -119,10 +119,19 @@ set
     when 'Todo AI' then 'Aplikasi manajemen tugas Laravel dengan Matriks Eisenhower, Google Classroom, Gemini AI, Google OAuth, Telegram Bot dua arah, kalender, dan laporan analitik.'
     when 'Sistem Rekap Absensi DPMPTSP' then 'Sistem Laravel untuk impor dan validasi data absensi, pengelolaan izin, dashboard analitik, serta laporan bulanan dan tahunan dalam format Excel dan PDF.'
     when 'Kandangan Fresh' then 'Marketplace Laravel untuk petani bawang merah dengan katalog, role admin dan pelanggan, Google OAuth, pembayaran Midtrans, invoice PDF, dan laporan penjualan.'
-    when 'Shuriza Store' then 'E-commerce platform with product catalog, shopping cart, and order management system.'
+    when 'Shuriza Store' then 'Platform e-commerce Laravel 12 untuk produk digital dengan checkout guest, pembayaran multi-gateway, sinkronisasi stok supplier, alokasi kredensial, dan otomasi fulfillment melalui bot WhatsApp serta Telegram.'
     else description
   end,
-  demo = case when title = 'Todo AI' then null else demo end
+  tech = case
+    when title = 'Shuriza Store' then array['Laravel 12', 'MySQL', 'Blade', 'Tailwind CSS', 'Payment Gateway', 'Bot Automation']
+    else tech
+  end,
+  github = case when title = 'Shuriza Store' then 'https://github.com/shuriza/shuriza-store' else github end,
+  demo = case
+    when title = 'Todo AI' then null
+    when title = 'Shuriza Store' then 'https://shurizastore.biz.id/'
+    else demo
+  end
 where title in ('Todo AI', 'Sistem Rekap Absensi DPMPTSP', 'Kandangan Fresh', 'Shuriza Store');
 
 insert into public.projects (
@@ -172,7 +181,7 @@ alter table public.profile add column if not exists languages jsonb not null def
 update public.profile
 set
   cv_headline = 'Junior Laravel Developer',
-  cv_summary = 'Lulusan D3 Manajemen Informatika Politeknik Negeri Malang dengan IPK 3,63 dan dasar Rekayasa Perangkat Lunak. Berpengalaman membangun aplikasi Laravel 11/12 berbasis MySQL untuk kebutuhan instansi dan akademik, termasuk REST API, Google OAuth, integrasi Gemini dan Telegram, serta laporan Excel/PDF.',
+  cv_summary = 'Lulusan D3 Manajemen Informatika Politeknik Negeri Malang dengan IPK 3,63 dan dasar Rekayasa Perangkat Lunak. Berpengalaman membangun aplikasi Laravel 11/12 berbasis MySQL untuk kebutuhan instansi dan akademik, termasuk REST API, Google OAuth, integrasi Gemini dan Telegram, serta laporan Excel/PDF. Tertarik dan sedang mendalami penerapan Artificial Intelligence (AI) dalam pengembangan aplikasi web.',
   soft_skills = array['Problem Solving', 'Kolaborasi Tim', 'Komunikasi', 'Manajemen Waktu'],
   languages = '[{"name":"Bahasa Indonesia","level":"Native"},{"name":"English","level":"Basic"}]'::jsonb
 where id = 1;
@@ -187,7 +196,7 @@ where id = 1 and (cv_headline = '' or cv_headline = 'Fullstack Web Developer');
 -- Timpa ringkasan lama bergaya mahasiswa hanya jika masih boilerplate default,
 -- supaya ringkasan yang sudah diedit manual lewat admin tidak ikut tertimpa.
 update public.profile
-set cv_summary = 'Lulusan D3 Manajemen Informatika dengan dasar Rekayasa Perangkat Lunak sejak SMK. Memiliki pengalaman mengerjakan proyek web menggunakan Laravel, PHP, MySQL, React, Next.js, dan TypeScript. Memiliki ketertarikan pada perkembangan Artificial Intelligence (AI).'
+set cv_summary = 'Lulusan D3 Manajemen Informatika dengan dasar Rekayasa Perangkat Lunak sejak SMK. Memiliki pengalaman mengerjakan proyek web menggunakan Laravel, PHP, MySQL, React, Next.js, dan TypeScript. Tertarik dan sedang mendalami penerapan Artificial Intelligence (AI) dalam pengembangan aplikasi web.'
 where id = 1 and (
   cv_summary = ''
   or cv_summary like 'Mahasiswa D3%'
@@ -200,7 +209,7 @@ set
   cv_headline = coalesce(nullif(cv_headline, ''), role),
   cv_summary = coalesce(
     nullif(cv_summary, ''),
-    'Lulusan D3 Manajemen Informatika dengan dasar Rekayasa Perangkat Lunak sejak SMK. Memiliki pengalaman mengerjakan proyek web menggunakan Laravel, PHP, MySQL, React, Next.js, dan TypeScript. Memiliki ketertarikan pada perkembangan Artificial Intelligence (AI).'
+    'Lulusan D3 Manajemen Informatika dengan dasar Rekayasa Perangkat Lunak sejak SMK. Memiliki pengalaman mengerjakan proyek web menggunakan Laravel, PHP, MySQL, React, Next.js, dan TypeScript. Tertarik dan sedang mendalami penerapan Artificial Intelligence (AI) dalam pengembangan aplikasi web.'
   ),
   soft_skills = case
     when coalesce(cardinality(soft_skills), 0) = 0
