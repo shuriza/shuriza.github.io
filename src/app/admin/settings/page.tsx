@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import AdminNav from "@/app/admin/AdminNav";
 import { updateSettings } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
+import { getAdminSettings } from "@/lib/db/queries";
 import { FEATURE_TOGGLES, resolveSettings } from "@/lib/settings";
+
 
 export const metadata: Metadata = {
   title: "Site settings",
@@ -14,12 +16,9 @@ export default async function AdminSettingsPage({
 }: {
   searchParams: Promise<{ error?: string; saved?: string }>;
 }) {
-  const { supabase, user } = await requireAdmin();
-  const [{ data, error }, params] = await Promise.all([
-    supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
-    searchParams,
-  ]);
-
+  const { user } = await requireAdmin();
+  const [result, params] = await Promise.all([getAdminSettings(), searchParams]);
+  const { data, error } = result;
   const settings = data ? resolveSettings(data) : null;
 
   return (
@@ -49,9 +48,9 @@ export default async function AdminSettingsPage({
             <h2 className="font-semibold text-white">Pengaturan tidak dapat dimuat</h2>
             <p className="mt-2 text-sm leading-relaxed">
               {error
-                ? "Periksa koneksi dan konfigurasi Supabase."
+                ? "Periksa koneksi database Neon."
                 : "Pastikan baris site_settings dengan ID 1 tersedia."}{" "}
-              Jalankan <code>supabase/upgrade.sql</code> bila perlu, lalu muat ulang halaman.
+              Jalankan <code>db/schema.sql</code> dan <code>db/seed.sql</code>, lalu muat ulang halaman.
               Form dinonaktifkan untuk mencegah nilai default menimpa database.
             </p>
           </section>

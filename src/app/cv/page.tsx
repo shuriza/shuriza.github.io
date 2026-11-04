@@ -77,18 +77,18 @@ export default async function CVPage() {
     title: category,
     items: skills.filter((skill) => skill.category === category),
   })).filter((group) => group.items.length > 0);
-  const cvProjectOrder = new Map([
-    ["Todo AI", 0],
-    ["Sistem Rekap Absensi DPMPTSP", 1],
-    ["Kandangan Fresh", 2],
-    ["Shuriza Store", 3],
-  ]);
+  const cvProjectOrder: Record<string, number> = {
+    "Sistem Rekap Absensi DPMPTSP": 0,
+    "Todo AI": 1,
+    "Kandangan Fresh": 2,
+    "Shuriza Store": 3,
+  };
   const cvProjects = projects
-    .filter((project) => cvProjectOrder.has(project.title))
+    .filter((project) => cvProjectOrder[project.title] !== undefined)
     .sort(
       (first, second) =>
-        (cvProjectOrder.get(first.title) ?? Number.MAX_SAFE_INTEGER) -
-        (cvProjectOrder.get(second.title) ?? Number.MAX_SAFE_INTEGER),
+        (cvProjectOrder[first.title] ?? Number.MAX_SAFE_INTEGER) -
+        (cvProjectOrder[second.title] ?? Number.MAX_SAFE_INTEGER),
     );
 
   return (
@@ -130,12 +130,18 @@ export default async function CVPage() {
             </p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-300">
               <li>
-                Mengembangkan sistem rekap absensi internal berbasis Laravel 12 dan MySQL
-                untuk membantu pengolahan data kehadiran pegawai.
+                Mengembangkan sebagian besar alur sistem rekap absensi internal dalam tim
+                beranggotakan empat mahasiswa, menggunakan Laravel 12 dan MySQL untuk
+                mengelola data kehadiran pegawai DPMPTSP Kota Kediri.
               </li>
               <li>
-                Mengimplementasikan impor dan validasi Excel, izin presensi, dashboard
-                analitik, serta laporan bulanan dan tahunan dalam format Excel dan PDF.
+                Membangun alur impor dan validasi Excel, pengelolaan izin presensi,
+                dashboard analitik per departemen, serta laporan bulanan dan tahunan
+                dalam format Excel dan PDF.
+              </li>
+              <li>
+                Mendemonstrasikan sistem kepada karyawan dan pengguna DPMPTSP pada tahap
+                akhir pengembangan.
               </li>
             </ul>
           </div>
@@ -194,7 +200,7 @@ export default async function CVPage() {
         )}
 
         {cvProjects.length > 0 && (
-          <Section title="Project Laravel Pilihan">
+          <Section title="Proyek Terpilih">
             <div className="space-y-4">
               {cvProjects.map((project) => (
                 <div key={project.id} className="cv-item">

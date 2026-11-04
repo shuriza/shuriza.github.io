@@ -2,16 +2,13 @@ import Link from "next/link";
 import AdminNav from "@/app/admin/AdminNav";
 import { deleteProject } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
+import { getAdminProjects } from "@/lib/db/queries";
 import type { Project } from "@/lib/projects";
 
 export default async function AdminProjectsPage() {
-  const { supabase, user } = await requireAdmin();
-  const { data, error } = await supabase
-    .from("projects")
-    .select("id, title, description, tech, github, demo, featured, published, sort_order, created_at")
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: false });
-  const projects = (data ?? []) as Project[];
+  const { user } = await requireAdmin();
+  const { data, error } = await getAdminProjects();
+  const projects = data as Project[];
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] px-6 py-10 text-slate-200">

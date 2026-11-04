@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { signOut } from "@/app/admin/actions";
-
+import { signOut } from "@/app/admin/auth-actions";
 const ADMIN_LINKS = [
   { href: "/admin/projects", label: "Projects" },
   { href: "/admin/skills", label: "Skills" },

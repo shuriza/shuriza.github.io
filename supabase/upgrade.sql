@@ -128,7 +128,7 @@ set
   end,
   github = case when title = 'Shuriza Store' then 'https://github.com/shuriza/shuriza-store' else github end,
   demo = case
-    when title = 'Todo AI' then null
+    when title = 'Todo AI' then 'https://todosxai.ninja/'
     when title = 'Shuriza Store' then 'https://shurizastore.biz.id/'
     else demo
   end

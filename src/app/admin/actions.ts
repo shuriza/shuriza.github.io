@@ -10,11 +10,24 @@ import {
   readSkillInput,
 } from "@/lib/admin-validation";
 import { requireAdmin } from "@/lib/admin";
+import {
+  createProject as insertProject,
+  createSkill as insertSkill,
+  deleteProject as deleteProjectRow,
+  deleteSkill as deleteSkillRow,
+  updateProfile as updateProfileRow,
+  updateProject as updateProjectRow,
+  updateSettings as updateSettingsRow,
+  updateSkill as updateSkillRow,
+  type ProfileWriteInput,
+  type SiteSettingsWriteInput,
+} from "@/lib/db/queries";
 import { PROFILE_CACHE_TAG } from "@/lib/profile";
 import { PROJECTS_CACHE_TAG } from "@/lib/projects";
 import { SETTINGS_CACHE_TAG } from "@/lib/settings-server";
 import { FEATURE_TOGGLES } from "@/lib/settings";
 import { SKILLS_CACHE_TAG } from "@/lib/skills-server";
+
 
 function errorUrl(path: string, message: string) {
   return `${path}?error=${encodeURIComponent(message)}`;
@@ -36,7 +49,7 @@ function revalidatePublicData(tag: string, adminPath: string) {
 }
 
 export async function createProject(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   let project;
   try {
     project = readProjectInput(formData);
@@ -44,9 +57,11 @@ export async function createProject(formData: FormData) {
     redirect(errorUrl("/admin/projects/new", validationMessage(error)));
   }
 
-  const { data, error } = await supabase.from("projects").insert(project).select("id");
-  if (error || data?.length !== 1) {
-    reportWriteError("membuat project", error ?? "Jumlah baris hasil bukan satu");
+  try {
+    const id = await insertProject(project);
+    if (!id) throw new Error("Jumlah baris hasil bukan satu");
+  } catch (error) {
+    reportWriteError("membuat project", error);
     redirect(errorUrl("/admin/projects/new", "Project gagal disimpan. Coba lagi."));
   }
 
@@ -55,7 +70,7 @@ export async function createProject(formData: FormData) {
 }
 
 export async function updateProject(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const id = String(formData.get("id") ?? "").trim();
   if (!isUuid(id)) redirect(errorUrl("/admin/projects", "ID project tidak valid."));
 
@@ -66,9 +81,11 @@ export async function updateProject(formData: FormData) {
     redirect(errorUrl(`/admin/projects/${id}/edit`, validationMessage(error)));
   }
 
-  const { data, error } = await supabase.from("projects").update(project).eq("id", id).select("id");
-  if (error || data?.length !== 1) {
-    reportWriteError("memperbarui project", error ?? "Project tidak ditemukan");
+  try {
+    const updatedId = await updateProjectRow(id, project);
+    if (!updatedId) throw new Error("Project tidak ditemukan");
+  } catch (error) {
+    reportWriteError("memperbarui project", error);
     redirect(errorUrl(`/admin/projects/${id}/edit`, "Project gagal diperbarui atau sudah tidak ada."));
   }
 
@@ -78,13 +95,15 @@ export async function updateProject(formData: FormData) {
 }
 
 export async function deleteProject(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const id = String(formData.get("id") ?? "").trim();
   if (!isUuid(id)) redirect(errorUrl("/admin/projects", "ID project tidak valid."));
 
-  const { data, error } = await supabase.from("projects").delete().eq("id", id).select("id");
-  if (error || data?.length !== 1) {
-    reportWriteError("menghapus project", error ?? "Project tidak ditemukan");
+  try {
+    const deletedId = await deleteProjectRow(id);
+    if (!deletedId) throw new Error("Project tidak ditemukan");
+  } catch (error) {
+    reportWriteError("menghapus project", error);
     redirect(errorUrl("/admin/projects", "Project gagal dihapus atau sudah tidak ada."));
   }
 
@@ -93,14 +112,8 @@ export async function deleteProject(formData: FormData) {
   redirect("/admin/projects");
 }
 
-export async function signOut() {
-  const { supabase } = await requireAdmin();
-  await supabase.auth.signOut();
-  redirect("/admin/login");
-}
-
 export async function createSkill(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   let skill;
   try {
     skill = readSkillInput(formData);
@@ -108,9 +121,11 @@ export async function createSkill(formData: FormData) {
     redirect(errorUrl("/admin/skills/new", validationMessage(error)));
   }
 
-  const { data, error } = await supabase.from("skills").insert(skill).select("id");
-  if (error || data?.length !== 1) {
-    reportWriteError("membuat skill", error ?? "Jumlah baris hasil bukan satu");
+  try {
+    const id = await insertSkill(skill);
+    if (!id) throw new Error("Jumlah baris hasil bukan satu");
+  } catch (error) {
+    reportWriteError("membuat skill", error);
     redirect(errorUrl("/admin/skills/new", "Skill gagal disimpan. Coba lagi."));
   }
 
@@ -119,7 +134,7 @@ export async function createSkill(formData: FormData) {
 }
 
 export async function updateSkill(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const id = String(formData.get("id") ?? "").trim();
   if (!isUuid(id)) redirect(errorUrl("/admin/skills", "ID skill tidak valid."));
 
@@ -130,9 +145,11 @@ export async function updateSkill(formData: FormData) {
     redirect(errorUrl(`/admin/skills/${id}/edit`, validationMessage(error)));
   }
 
-  const { data, error } = await supabase.from("skills").update(skill).eq("id", id).select("id");
-  if (error || data?.length !== 1) {
-    reportWriteError("memperbarui skill", error ?? "Skill tidak ditemukan");
+  try {
+    const updatedId = await updateSkillRow(id, skill);
+    if (!updatedId) throw new Error("Skill tidak ditemukan");
+  } catch (error) {
+    reportWriteError("memperbarui skill", error);
     redirect(errorUrl(`/admin/skills/${id}/edit`, "Skill gagal diperbarui atau sudah tidak ada."));
   }
 
@@ -142,13 +159,15 @@ export async function updateSkill(formData: FormData) {
 }
 
 export async function deleteSkill(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const id = String(formData.get("id") ?? "").trim();
   if (!isUuid(id)) redirect(errorUrl("/admin/skills", "ID skill tidak valid."));
 
-  const { data, error } = await supabase.from("skills").delete().eq("id", id).select("id");
-  if (error || data?.length !== 1) {
-    reportWriteError("menghapus skill", error ?? "Skill tidak ditemukan");
+  try {
+    const deletedId = await deleteSkillRow(id);
+    if (!deletedId) throw new Error("Skill tidak ditemukan");
+  } catch (error) {
+    reportWriteError("menghapus skill", error);
     redirect(errorUrl("/admin/skills", "Skill gagal dihapus atau sudah tidak ada."));
   }
 
@@ -158,17 +177,19 @@ export async function deleteSkill(formData: FormData) {
 }
 
 export async function updateProfile(formData: FormData) {
-  const { supabase } = await requireAdmin();
-  let profile;
+  await requireAdmin();
+  let profile: ProfileWriteInput;
   try {
-    profile = readProfileInput(formData);
+    profile = readProfileInput(formData) as ProfileWriteInput;
   } catch (error) {
     redirect(errorUrl("/admin/profile", validationMessage(error)));
   }
 
-  const { data, error } = await supabase.from("profile").update(profile).eq("id", 1).select("id");
-  if (error || data?.length !== 1 || data[0]?.id !== 1) {
-    reportWriteError("memperbarui profile", error ?? "Profile tidak ditemukan");
+  try {
+    const updatedId = await updateProfileRow(profile);
+    if (updatedId !== 1) throw new Error("Profile tidak ditemukan");
+  } catch (error) {
+    reportWriteError("memperbarui profile", error);
     redirect(errorUrl("/admin/profile", "Profile gagal disimpan. Coba lagi."));
   }
 
@@ -177,18 +198,16 @@ export async function updateProfile(formData: FormData) {
 }
 
 export async function updateSettings(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const flags = Object.fromEntries(
     FEATURE_TOGGLES.map((toggle) => [toggle.key, formData.get(toggle.key) === "on"]),
-  );
+  ) as SiteSettingsWriteInput;
 
-  const { data, error } = await supabase
-    .from("site_settings")
-    .update({ ...flags, updated_at: new Date().toISOString() })
-    .eq("id", 1)
-    .select("id");
-  if (error || data?.length !== 1 || data[0]?.id !== 1) {
-    reportWriteError("memperbarui pengaturan", error ?? "Pengaturan tidak ditemukan");
+  try {
+    const updatedId = await updateSettingsRow(flags);
+    if (updatedId !== 1) throw new Error("Pengaturan tidak ditemukan");
+  } catch (error) {
+    reportWriteError("memperbarui pengaturan", error);
     redirect(errorUrl("/admin/settings", "Pengaturan gagal disimpan. Coba lagi."));
   }
 

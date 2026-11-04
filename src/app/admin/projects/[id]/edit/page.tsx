@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { updateProject } from "@/app/admin/actions";
 import ProjectForm from "@/app/admin/projects/ProjectForm";
 import { requireAdmin } from "@/lib/admin";
+import { getAdminProject } from "@/lib/db/queries";
 import { isUuid } from "@/lib/admin-validation";
 import type { Project } from "@/lib/projects";
+
 
 export default async function EditProjectPage({
   params,
@@ -13,16 +15,12 @@ export default async function EditProjectPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ error?: string }>;
 }) {
-  const { supabase } = await requireAdmin();
   const { id } = await params;
+  await requireAdmin();
   const { error } = await searchParams;
   if (!isUuid(id)) notFound();
 
-  const { data, error: queryError } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  const { data, error: queryError } = await getAdminProject(id);
 
   if (queryError) {
     console.error("[admin] gagal memuat project:", queryError);
@@ -32,7 +30,7 @@ export default async function EditProjectPage({
           <Link href="/admin/projects" className="text-sm text-slate-400 hover:text-cyan-400">&larr; Semua project</Link>
           <section role="alert" className="mt-6 rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-red-200">
             <h1 className="font-semibold text-white">Project tidak dapat dimuat</h1>
-            <p className="mt-2 text-sm">Periksa koneksi Supabase, lalu muat ulang halaman. Tidak ada perubahan yang dapat disimpan saat ini.</p>
+            <p className="mt-2 text-sm">Periksa koneksi database Neon, lalu muat ulang halaman. Tidak ada perubahan yang dapat disimpan saat ini.</p>
           </section>
         </div>
       </main>

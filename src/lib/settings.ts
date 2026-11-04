@@ -50,7 +50,7 @@ export type FeatureFlagKey = (typeof FEATURE_TOGGLES)[number]["key"];
 
 export type SiteSettings = { id: number } & Record<FeatureFlagKey, boolean>;
 
-/** Semua fitur aktif. Dipakai saat Supabase belum dikonfigurasi atau migration belum dijalankan. */
+/** Semua fitur aktif. Dipakai saat database belum dikonfigurasi atau migration belum dijalankan. */
 export const fallbackSettings: SiteSettings = {
   id: 1,
   about_enabled: true,

@@ -1,6 +1,7 @@
 import AdminNav from "@/app/admin/AdminNav";
 import { updateProfile } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
+import { getAdminProfile } from "@/lib/db/queries";
 import { parseEditableProfile } from "@/lib/profile";
 
 export default async function AdminProfilePage({
@@ -8,12 +9,11 @@ export default async function AdminProfilePage({
 }: {
   searchParams: Promise<{ error?: string; saved?: string }>;
 }) {
-  const { supabase, user } = await requireAdmin();
-  const [{ data, error: profileError }, params] = await Promise.all([
-    supabase.from("profile").select("*").eq("id", 1).maybeSingle(),
-    searchParams,
-  ]);
+  const { user } = await requireAdmin();
+  const [result, params] = await Promise.all([getAdminProfile(), searchParams]);
+  const { data, error: profileError } = result;
   const profile = data ? parseEditableProfile(data) : null;
+
 
   if (profileError) console.error("[admin] gagal memuat profile:", profileError);
 
@@ -37,8 +37,8 @@ export default async function AdminProfilePage({
             <h2 className="font-semibold text-white">Profile tidak dapat dimuat</h2>
             <p className="mt-2 text-sm leading-relaxed">
               {profileError
-                ? "Periksa koneksi dan konfigurasi Supabase."
-                : "Pastikan migration terbaru sudah dijalankan dan baris profile dengan ID 1 tersedia."}{" "}
+                ? "Periksa koneksi database Neon."
+                : "Jalankan db/schema.sql dan db/seed.sql, lalu pastikan baris profile dengan ID 1 tersedia."}{" "}
               Lalu muat ulang halaman. Form dinonaktifkan agar data yang tidak lengkap tidak
               menimpa database.
             </p>

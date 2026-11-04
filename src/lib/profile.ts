@@ -1,30 +1,9 @@
 import { unstable_cache } from "next/cache";
-import { createAnonymousSupabaseClient, isMissingRelationError } from "@/lib/supabase/anonymous";
+import { getPublicProfile } from "@/lib/db/queries";
+
 
 export const PROFILE_CACHE_TAG = "public-profile";
 
-const PUBLIC_PROFILE_COLUMNS = [
-  "id",
-  "display_name",
-  "short_name",
-  "role",
-  "bio_primary",
-  "bio_secondary",
-  "location",
-  "focus",
-  "education",
-  "status",
-  "email",
-  "github",
-  "linkedin",
-  "website",
-  "hero_roles",
-  "hero_description",
-  "cv_headline",
-  "cv_summary",
-  "soft_skills",
-  "languages",
-].join(", ");
 
 export interface CvLanguage {
   name: string;
@@ -80,9 +59,9 @@ export const fallbackProfile: Profile = {
   ],
   hero_description:
     "Junior Laravel Developer dengan pengalaman membangun aplikasi operasional, integrasi API, autentikasi, dan laporan berbasis data.",
-  cv_headline: "Junior Laravel Developer",
+  cv_headline: "Junior Web Developer | Laravel, PHP, MySQL",
   cv_summary:
-    "Lulusan D3 Manajemen Informatika Politeknik Negeri Malang dengan IPK 3,63 dan dasar Rekayasa Perangkat Lunak. Berpengalaman membangun aplikasi Laravel 11/12 berbasis MySQL untuk kebutuhan instansi dan akademik, termasuk REST API, Google OAuth, integrasi Gemini dan Telegram, serta laporan Excel/PDF. Tertarik dan sedang mendalami penerapan Artificial Intelligence (AI) dalam pengembangan aplikasi web.",
+    "Lulusan D3 Manajemen Informatika Politeknik Negeri Malang (IPK 3,63) dengan pengalaman magang dan proyek mandiri dalam membangun aplikasi web menggunakan Laravel, PHP, dan MySQL. Dalam tim beranggotakan empat mahasiswa, mengembangkan sebagian besar alur sistem rekap absensi DPMPTSP Kota Kediri, termasuk impor dan validasi Excel, pengelolaan izin, dashboard analitik, serta laporan Excel/PDF, lalu mendemonstrasikannya kepada pengguna. Membangun pula aplikasi manajemen tugas dengan integrasi Google Classroom, Gemini AI, dan Telegram Bot. Memahami perancangan database, autentikasi, otorisasi, REST API, dan integrasi layanan pihak ketiga.",
   soft_skills: ["Problem Solving", "Kolaborasi Tim", "Komunikasi", "Manajemen Waktu"],
   languages: [
     { name: "Bahasa Indonesia", level: "Native" },
@@ -129,8 +108,8 @@ export function normalizeProfile(data: Record<string, unknown>): Profile {
   const languages = normalizeLanguages(data.languages);
 
   return {
-    // Construct the public shape explicitly so a legacy `select(*)` fallback
-    // can never expose a later private database column to the application.
+    // Construct the public shape explicitly so private database columns never
+    // cross the server-to-render boundary.
     id: 1,
     display_name: profileText(data, "display_name"),
     short_name: profileText(data, "short_name"),
@@ -157,13 +136,6 @@ export function normalizeProfile(data: Record<string, unknown>): Profile {
   };
 }
 
-function isMissingLegacyProfileColumn(error: { code?: string; message?: string } | null) {
-  const message = error?.message ?? "";
-  return (
-    (error?.code === "42703" || error?.code === "PGRST204" || /schema cache|does not exist/i.test(message)) &&
-    /cv_headline|cv_summary|soft_skills|languages/i.test(message)
-  );
-}
 
 export function parseEditableProfile(data: unknown): Profile | null {
   if (typeof data !== "object" || data === null) return null;
@@ -228,43 +200,21 @@ export function parseEditableProfile(data: unknown): Profile | null {
 }
 
 const getCachedProfile = unstable_cache(async (): Promise<Profile> => {
-  const supabase = createAnonymousSupabaseClient();
-  if (!supabase) throw new Error("Supabase belum dikonfigurasi.");
-
-  const response = await supabase
-    .from("portfolio_profile")
-    .select(PUBLIC_PROFILE_COLUMNS)
-    .eq("id", 1)
-    .maybeSingle();
-  let data: unknown = response.data;
-  let error = response.error as { code?: string; message?: string } | null;
-
-  if (isMissingRelationError(response.error, "portfolio_profile")) {
-    const legacyResponse = await supabase
-      .from("profile")
-      .select(PUBLIC_PROFILE_COLUMNS)
-      .eq("id", 1)
-      .maybeSingle();
-    const legacyProfile = isMissingLegacyProfileColumn(legacyResponse.error)
-      ? await supabase.from("profile").select("*").eq("id", 1).maybeSingle()
-      : legacyResponse;
-
-    data = legacyProfile.data;
-    error = legacyProfile.error as { code?: string; message?: string } | null;
-  }
-
-  if (error || !data) {
-    console.error("[profile] gagal memuat data publik:", error ?? "baris profile utama tidak ditemukan");
+  try {
+    const data = await getPublicProfile();
+    if (!data) {
+      console.error("[profile] baris profile utama tidak ditemukan");
+      return fallbackProfile;
+    }
+    return normalizeProfile(data as unknown as Record<string, unknown>);
+  } catch (error) {
+    console.error("[profile] gagal memuat data publik:", error);
     return fallbackProfile;
   }
-
-  // Public views are added by SQL migration and are not present in Supabase's generated schema.
-  // Normalize the untyped query boundary before exposing it to the rest of the application.
-  return normalizeProfile(data as unknown as Record<string, unknown>);
 }, [PROFILE_CACHE_TAG], { tags: [PROFILE_CACHE_TAG], revalidate: 300 });
 
 export async function getProfile(): Promise<Profile> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (!process.env.DATABASE_URL) {
     return fallbackProfile;
   }
 

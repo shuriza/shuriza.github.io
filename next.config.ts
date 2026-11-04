@@ -1,25 +1,9 @@
 import type { NextConfig } from "next";
 
-function getConnectSources() {
-  const sources = ["'self'"];
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-  if (supabaseUrl) {
-    try {
-      const url = new URL(supabaseUrl);
-      sources.push(url.origin, `wss://${url.host}`);
-    } catch {
-      console.warn("NEXT_PUBLIC_SUPABASE_URL is not a valid URL; omitting it from CSP.");
-    }
-  }
-
-  return sources.join(" ");
-}
-
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
-  `connect-src ${getConnectSources()}`,
+  "connect-src 'self'",
   "font-src 'self' data:",
   "form-action 'self'",
   "frame-ancestors 'none'",
@@ -30,6 +14,7 @@ const contentSecurityPolicy = [
   "worker-src 'self' blob:",
   "upgrade-insecure-requests",
 ].join("; ");
+
 
 const nextConfig: NextConfig = {
   experimental: {

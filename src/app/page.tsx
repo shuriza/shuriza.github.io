@@ -63,7 +63,7 @@ export default async function Home() {
         />
         {settings.about_enabled && <About profile={profile} />}
         {settings.skills_enabled && <Skills skills={skills} />}
-        {settings.projects_enabled && <Projects projects={projects} />}
+        {settings.projects_enabled && <Projects projects={projects} compact />}
         <Certificates />
         {settings.contact_enabled && (
           <Contact profile={profile} showCvLink={settings.cv_enabled} />

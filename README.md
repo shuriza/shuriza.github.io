@@ -1,6 +1,6 @@
 # Shuriza Portfolio
 
-Personal portfolio website with 3D particle animations, animated terminal, and modern UI.
+Personal portfolio website with 3D particle animations, animated terminal, and a server-side admin dashboard.
 
 **Live:** [shuriza.tech](https://shuriza.tech)
 
@@ -13,13 +13,24 @@ Personal portfolio website with 3D particle animations, animated terminal, and m
 
 ## Features
 
-- 3D floating particles & wireframe shapes (Three.js / React Three Fiber)
+- 3D floating particles and wireframe shapes (Three.js / React Three Fiber)
 - Typewriter text animation
-- Animated terminal (code typing effect)
-- Scroll-triggered section animations (Framer Motion)
-- Responsive design with mobile hamburger menu
-- Dark theme with cyan accent
+- Animated terminal
+- Scroll-triggered section animations
+- Responsive layout with mobile navigation
 - Certificate and course-completion evidence with direct document links
+- Admin CRUD for projects, skills, profile/CV, and feature toggles
+
+## Project catalog
+
+The public [Project Lab](https://shuriza.tech/projects) is a curated catalog, not a list of unverified links. Projects are labeled by the evidence a visitor can actually inspect:
+
+- **Live Demo**: a public URL is available.
+- **Hosted Demo**: a hosted preview is available, but it is not presented as a production service.
+- **Case Study / Source**: the repository, implementation notes, or a project walkthrough is available without a live deployment.
+- **Private Case Study**: the work is described at a safe, anonymized level because the source or data is proprietary.
+
+Projects that are not yet in the database are maintained in `src/lib/project-catalog.ts`. Server-side project loading merges that catalog with CMS rows, while client components consume only the framework-independent model and presentation data. This keeps the portfolio useful in a fresh build and prevents a missing database row from silently hiding a finished project.
 
 ## Tech Stack
 
@@ -29,7 +40,9 @@ Personal portfolio website with 3D particle animations, animated terminal, and m
 | Language | TypeScript |
 | Styling | Tailwind CSS 4 |
 | 3D | Three.js, @react-three/fiber, @react-three/drei |
-| Animation | Framer Motion |
+| Database | Neon PostgreSQL |
+| Data access | Drizzle ORM + Neon HTTP driver |
+| Admin auth | Signed HttpOnly session cookie + scrypt password hash |
 | Deploy | Vercel |
 
 ## Getting Started
@@ -39,68 +52,101 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000).
 
-## Build
+## Database setup
 
-```bash
-npm run build
-```
+The application reads the database only on the server. Public pages use explicit, read-only query projections; browser code never receives a database credential. Admin Server Actions re-check the signed session before every mutation.
 
-## Admin Project CRUD
+1. Create a Neon database through the [Vercel Marketplace Neon integration](https://vercel.com/marketplace/neon), or create a project directly in Neon.
+2. Run `db/schema.sql` against the new database.
+3. For a new installation, run `db/seed.sql`. For an existing Supabase installation, follow [Migrating from Supabase](#migrating-from-supabase) instead of seeding first.
+4. Copy `.env.example` to `.env.local` and fill the variables below.
+5. Generate an admin password hash:
 
-Dashboard admin tersedia di `/admin/login` dan menggunakan Supabase Auth dengan
-email/password. Data project, skills, profile, halaman CV, dan pengaturan fitur
-disimpan di Supabase PostgreSQL, bukan di browser.
+   ```bash
+   npm run db:hash-password
+   ```
 
-1. Buat project di [Supabase](https://supabase.com/), lalu buka SQL Editor.
-2. Jalankan isi file `supabase/schema.sql` untuk membuat tabel, RLS policy, dan seed project, skills, serta profile. Jika schema lama sudah pernah dijalankan, cukup jalankan `supabase/upgrade.sql`.
-3. Buat user admin di Supabase Dashboard melalui **Authentication > Users > Add user**.
-4. Jalankan query terakhir di `supabase/schema.sql` dengan UUID user tersebut agar akun punya akses admin.
-5. Salin `.env.example` menjadi `.env.local`, lalu isi URL dan anon key dari **Project Settings > API**.
-6. Jalankan `npm run dev`, kemudian buka `http://localhost:3000/admin/login`.
+   Put the printed value in `ADMIN_PASSWORD_HASH`. The command accepts an optional local-only argument, but an interactive prompt is safer for shell history.
 
-Menu dashboard:
+6. Generate `AUTH_SECRET` locally and add the result to `.env.local`:
 
-| Menu | Fungsi |
-|------|--------|
-| Projects | CRUD project yang tampil di halaman utama dan CV |
-| Skills | CRUD skill per kategori (Frontend/Backend/Tools) |
-| Profile | Identitas, bio, hero, kontak, dan konten halaman CV |
-| Settings | Menyembunyikan/menampilkan fitur situs |
+   ```bash
+   node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
+   ```
 
-### Halaman CV
+7. Start the app and open `http://localhost:3000/admin/login`.
 
-`/cv` sepenuhnya mengambil data dari database: header dan ringkasan dari tabel
-`profile`, skill dari tabel `skills`, dan project dari tabel `projects`. Tidak ada
-lagi data yang di-hardcode, jadi CV tidak bisa lagi berbeda dari halaman utama.
-Field khusus CV (`cv_headline`, `cv_summary`, soft skills, dan bahasa) diatur di
-menu **Profile**.
-
-### Menyembunyikan fitur
-
-Menu **Settings** menyimpan toggle di tabel `site_settings`: section About,
-Skills, Projects, Contact, halaman CV, background 3D, dan tombol Login di navbar.
-Mematikan toggle hanya menyembunyikan tampilannya — datanya tetap di database dan
-bisa dinyalakan lagi kapan saja. Khusus `cv_enabled`, rute `/cv` akan membalas 404
-saat dimatikan, dan link CV di navbar serta section Contact ikut hilang.
-
-Toggle **Tombol Login di navbar** hanya menyembunyikan tombolnya; `/admin/login`
-tetap bisa diakses langsung dan tetap dilindungi Supabase Auth + RLS.
-
-Jika tabel `site_settings` atau kolom CV belum ada (migration belum dijalankan),
-semua fitur dianggap aktif dan halaman publik tetap tampil normal. Halaman
-`/admin/settings` akan menampilkan peringatan berisi instruksi migration.
-
-Environment yang dibutuhkan:
+### Environment variables
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+ADMIN_EMAIL=you@example.com
+ADMIN_PASSWORD_HASH="scrypt$16384$8$1$generated-salt$generated-hash"
+AUTH_SECRET=at-least-32-random-characters
 ```
 
-Saat environment Supabase belum diisi, halaman publik tetap menampilkan project
-portfolio sebagai fallback. CRUD admin baru aktif setelah konfigurasi Supabase selesai.
+`DATABASE_URL`, `ADMIN_PASSWORD_HASH`, and `AUTH_SECRET` are server-only secrets. Do not prefix them with `NEXT_PUBLIC_` and do not commit `.env` files.
+
+When `DATABASE_URL` is absent, public routes deliberately use the checked-in fallback content so CI and a first build remain usable. Admin routes stay disabled until all auth variables are present.
+
+## Admin dashboard
+
+The dashboard is available at `/admin/login`.
+
+| Menu | Function |
+|------|----------|
+| Projects | CRUD project yang tampil di portfolio dan CV |
+| Skills | CRUD skill per kategori (Frontend/Backend/Tools) |
+| Profile | Identitas, bio, hero, kontak, dan konten CV |
+| Settings | Menyembunyikan/menampilkan fitur situs |
+
+The login account is the single `ADMIN_EMAIL` configured in Vercel. There is no public database API and no browser-side database client. The admin session is an HttpOnly, SameSite cookie signed with `AUTH_SECRET`; the server validates it again inside `requireAdmin()` and every Server Action.
+
+## Migrating from Supabase
+
+The old Supabase project should remain untouched until the new deployment has passed the public-page and admin CRUD smoke checks. The migration copies content tables only; Supabase Auth users are intentionally not copied because the new dashboard uses the configured single-admin credentials.
+
+1. Create the Neon database and run only `db/schema.sql`.
+2. Obtain the Supabase **direct PostgreSQL connection string** using the database password. The anon key is not sufficient for a full export.
+3. Set temporary local variables (PowerShell example):
+
+   ```powershell
+   $env:SUPABASE_DATABASE_URL="postgresql://..."
+   $env:DATABASE_URL="postgresql://...neon.tech/...?..."
+   ```
+
+4. Run the idempotent importer:
+
+   ```bash
+   npm run db:migrate:supabase
+   ```
+
+   It migrates `projects`, `skills`, the singleton `profile`, and `site_settings`, preserving IDs, timestamps, drafts, and CV JSON data. It does not migrate `auth.users` or `admin_users`.
+
+5. Generate a new `ADMIN_PASSWORD_HASH` and set `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, and `AUTH_SECRET` in Vercel.
+6. Deploy and verify `/`, `/cv`, `/admin/login`, one project edit, one skill edit, profile save, settings save, and logout.
+7. Remove the old `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` variables only after verification. Keep the Supabase project as a temporary rollback source until the cutover is accepted.
+
+The one-time importer requires the `postgres` dev dependency and reads credentials only from process environment. Never commit either connection string.
+
+## Vercel deployment
+
+1. Install the Neon integration from the Vercel Marketplace and connect it to the production project.
+2. Add `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, and `AUTH_SECRET` to the **Production** environment. Keep them out of Preview unless a separate preview admin is intended.
+3. Redeploy after the environment variables and Neon schema/data are ready.
+4. Confirm the deployment uses `DATABASE_URL` injected by the integration and that no `NEXT_PUBLIC_SUPABASE_*` variable is still required.
+
+Vercel Postgres is not used here: Vercel's own documentation states that the product is no longer available for new projects; Neon is connected through the Marketplace instead.
+
+## Verification commands
+
+```bash
+npm test
+npm run lint
+npm run build
+```
 
 ## License
 

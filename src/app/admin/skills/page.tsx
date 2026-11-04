@@ -2,16 +2,13 @@ import Link from "next/link";
 import AdminNav from "@/app/admin/AdminNav";
 import { deleteSkill } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
+import { getAdminSkills } from "@/lib/db/queries";
 import { SKILL_ICON_OPTIONS, type Skill } from "@/lib/skills";
 
 export default async function AdminSkillsPage() {
-  const { supabase, user } = await requireAdmin();
-  const { data, error } = await supabase
-    .from("skills")
-    .select("id, name, category, icon, color, published, sort_order")
-    .order("category")
-    .order("sort_order");
-  const skills = (data ?? []) as Skill[];
+  const { user } = await requireAdmin();
+  const { data, error } = await getAdminSkills();
+  const skills = data as Skill[];
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] px-6 py-10 text-slate-200">
@@ -29,7 +26,7 @@ export default async function AdminSkillsPage() {
         </header>
         {error && <p className="mb-5 text-sm text-red-400">Gagal memuat skill: {error.message}</p>}
         <div className="overflow-hidden rounded-xl border border-[#334155] bg-[#0f172a]">
-          {skills.length === 0 ? <p className="px-5 py-10 text-center text-slate-400">Belum ada skill. Jalankan migration Supabase terlebih dahulu.</p> : skills.map((skill) => {
+          {skills.length === 0 ? <p className="px-5 py-10 text-center text-slate-400">Belum ada skill. Jalankan db/schema.sql dan db/seed.sql terlebih dahulu.</p> : skills.map((skill) => {
             const Icon = SKILL_ICON_OPTIONS[skill.icon] ?? SKILL_ICON_OPTIONS.TbApi;
             return <div key={skill.id} className="grid gap-4 border-b border-[#334155] px-5 py-5 last:border-0 sm:grid-cols-[1fr_140px_120px_160px] sm:items-center">
               <div className="flex items-center gap-3"><Icon size={22} style={{ color: skill.color }} /><div><h2 className="font-semibold text-white">{skill.name}</h2><p className="text-xs text-slate-500">{skill.icon}</p></div></div>

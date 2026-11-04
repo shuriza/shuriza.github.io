@@ -1,132 +1,87 @@
 import { unstable_cache } from "next/cache";
-import { createAnonymousSupabaseClient, isMissingRelationError } from "@/lib/supabase/anonymous";
+import { getPublicProjects } from "@/lib/db/queries";
+import { type Project } from "@/lib/project-model";
+import { CURATED_PROJECTS } from "@/lib/project-catalog";
+
+export { PROJECT_CATEGORY_LABELS, PROJECT_STATUS_LABELS } from "@/lib/project-model";
+export { ARCHIVED_REPOSITORIES, CURATED_PROJECTS } from "@/lib/project-catalog";
+export type { Project, ProjectCategory, ProjectStatus } from "@/lib/project-model";
 
 export const PROJECTS_CACHE_TAG = "public-projects";
 
-export interface Project {
-  id: string;
-  title: string;
-  description: string;
-  tech: string[];
-  github: string | null;
-  demo: string | null;
-  featured: boolean;
-  published: boolean;
-  sort_order: number;
+const curatedByTitle = new Map(CURATED_PROJECTS.map((project) => [project.title, project]));
+
+export function slugifyProjectTitle(title: string) {
+  return title
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
-const fallbackProjects: Project[] = [
-  {
-    id: "todo-ai",
-    title: "Todo AI",
-    description:
-      "Aplikasi manajemen tugas Laravel dengan Matriks Eisenhower, Google Classroom, Gemini AI, Google OAuth, Telegram Bot dua arah, kalender, dan laporan analitik.",
-    tech: ["Laravel 12", "PHP", "MySQL", "Gemini API", "Google Classroom API", "Telegram Bot"],
-    github: "https://github.com/shuriza/todos",
-    demo: null,
-    featured: true,
-    published: true,
-    sort_order: 0,
-  },
-  {
-    id: "rekap-absensi-dpmptsp",
-    title: "Sistem Rekap Absensi DPMPTSP",
-    description:
-      "Sistem Laravel untuk impor dan validasi data absensi, pengelolaan izin, dashboard analitik, serta laporan bulanan dan tahunan dalam format Excel dan PDF.",
-    tech: ["Laravel 12", "PHP", "MySQL", "Alpine.js", "Laravel Excel", "DomPDF"],
-    github: "https://github.com/shuriza/rekap_absensi",
-    demo: null,
-    featured: false,
-    published: true,
-    sort_order: 1,
-  },
-  {
-    id: "kandangan-fresh",
-    title: "Kandangan Fresh",
-    description:
-      "Marketplace Laravel untuk petani bawang merah dengan katalog, role admin dan pelanggan, Google OAuth, pembayaran Midtrans, invoice PDF, dan laporan penjualan.",
-    tech: ["Laravel 11", "PHP", "MySQL", "Midtrans", "Laravel Socialite", "DomPDF"],
-    github: "https://github.com/shuriza/bawang",
-    demo: null,
-    featured: false,
-    published: true,
-    sort_order: 2,
-  },
-  {
-    id: "shuriza-store",
-    title: "Shuriza Store",
-    description:
-      "Platform e-commerce Laravel 12 untuk produk digital dengan checkout guest, pembayaran multi-gateway, sinkronisasi stok supplier, alokasi kredensial, dan otomasi fulfillment melalui bot WhatsApp serta Telegram.",
-    tech: [
-      "Laravel 12",
-      "MySQL",
-      "Blade",
-      "Tailwind CSS",
-      "Payment Gateway",
-      "Bot Automation",
-    ],
-    github: "https://github.com/shuriza/shuriza-store",
-    demo: "https://shurizastore.biz.id/",
-    featured: false,
-    published: true,
-    sort_order: 3,
-  },
-  {
-    id: "cosplaynesia",
-    title: "CosplayNesia",
-    description:
-      "Masih dalam pengembangan — marketplace penyewaan dan pembelian kostum cosplay dengan checkout atomik, reservasi sewa, fulfillment multi-penjual, dan ulasan pembeli terverifikasi.",
-    tech: ["Laravel 13", "PHP", "SQLite", "Blade", "JavaScript"],
-    github: "https://github.com/shuriza/CosplayNesia",
-    demo: null,
-    featured: false,
-    published: true,
-    sort_order: 4,
-  },
-  {
-    id: "focus-tracker",
-    title: "Focus Tracker",
-    description:
-      "Masih dalam pengembangan — pencatat durasi browsing dan pemblokir distraksi melalui ekstensi Chrome, sinkronisasi Supabase, aturan kuota domain, dan dashboard analitik tujuh hari.",
-    tech: ["Next.js 16", "TypeScript", "Supabase", "Chrome Extension MV3", "Recharts"],
-    github: "https://github.com/shuriza/focus-tracker",
-    demo: null,
-    featured: false,
-    published: true,
-    sort_order: 5,
-  },
-];
+export function enrichProject(project: Project): Project {
+  const curated = curatedByTitle.get(project.title);
+  if (!curated) {
+    return {
+      ...project,
+      slug: project.slug ?? slugifyProjectTitle(project.title),
+      status: project.status ?? (project.demo ? "live" : "private"),
+      category: project.category ?? "case-study",
+      features: project.features ?? [],
+      screenshots: project.screenshots ?? [],
+      video: project.video ?? null,
+    };
+  }
+
+  return {
+    ...project,
+    description: curated.description,
+    tech: curated.tech,
+    github: curated.github,
+    demo: curated.demo,
+    featured: curated.featured,
+    published: project.published,
+    sort_order: curated.sort_order,
+    slug: project.slug ?? curated.slug ?? slugifyProjectTitle(curated.title),
+    status: curated.status,
+    category: curated.category,
+    problem: curated.problem,
+    role: curated.role,
+    features: curated.features,
+    limitations: curated.limitations,
+    video: curated.video ?? null,
+    screenshots: curated.screenshots ?? [],
+  };
+}
+
+export function mergeCuratedProjects(projects: Project[]): Project[] {
+  const normalized = projects.map(enrichProject);
+  const knownTitles = new Set(normalized.map((project) => project.title));
+  const additions = CURATED_PROJECTS.filter((project) => !knownTitles.has(project.title)).map(enrichProject);
+
+  return [...normalized, ...additions]
+    .filter((project) => project.published)
+    .sort((a, b) => a.sort_order - b.sort_order || a.title.localeCompare(b.title, "id"));
+}
+
+const fallbackProjects: Project[] = CURATED_PROJECTS;
 
 const getCachedPublishedProjects = unstable_cache(async (): Promise<Project[]> => {
-  const supabase = createAnonymousSupabaseClient();
-  if (!supabase) throw new Error("Supabase belum dikonfigurasi.");
-
-  const response = await supabase
-    .from("portfolio_projects")
-    .select("id, title, description, tech, github, demo, featured, published, sort_order")
-    .order("sort_order", { ascending: true })
-    .order("id", { ascending: true });
-  const { data, error } = isMissingRelationError(response.error, "portfolio_projects")
-    ? await supabase
-        .from("projects")
-        .select("id, title, description, tech, github, demo, featured, published, sort_order")
-        .eq("published", true)
-        .order("sort_order", { ascending: true })
-        .order("created_at", { ascending: false })
-    : response;
-
-  if (error) {
+  try {
+    return (await getPublicProjects()) as Project[];
+  } catch (error) {
     console.error("[projects] gagal memuat data publik:", error);
     return fallbackProjects;
   }
-
-  return (data ?? []) as unknown as Project[];
 }, [PROJECTS_CACHE_TAG], { tags: [PROJECTS_CACHE_TAG], revalidate: 300 });
 
 export async function getPublishedProjects(): Promise<Project[]> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return fallbackProjects;
-  }
+  const sourceProjects = process.env.DATABASE_URL ? await getCachedPublishedProjects() : fallbackProjects;
+  return mergeCuratedProjects(sourceProjects);
+}
 
-  return getCachedPublishedProjects();
+export async function getProjectBySlug(slug: string) {
+  const projects = await getPublishedProjects();
+  return projects.find((project) => project.slug === slug) ?? null;
 }
