@@ -36,6 +36,11 @@ export const CURATED_PROJECTS: Project[] = [
     ],
     limitations:
       "Repository dan demo hosted belum dipublikasikan. Case study ini menggunakan screenshot lokal; bukan klaim deployment production.",
+    screenshots: [
+      "/project-evidence/luncur-dashboard.png",
+      "/project-evidence/luncur-preview.png",
+      "/project-evidence/luncur-analytics.png",
+    ],
   },
   {
     id: "gudang-scan",
@@ -130,7 +135,12 @@ export const CURATED_PROJECTS: Project[] = [
       "Laporan bulanan dan tahunan dalam Excel/PDF",
       "Demo akhir kepada pegawai dan pengguna",
     ],
-    limitations: "Tidak ada data pegawai nyata yang dipublikasikan. Tinjauan dilakukan melalui source code dan case study.",
+    limitations: "Tidak ada data pegawai nyata yang dipublikasikan. Tinjauan dilakukan melalui source code, screenshot yang dianonimkan, dan case study.",
+    screenshots: [
+      "https://raw.githubusercontent.com/shuriza/rekap_absensi/main/public/images/project-dashboard.png",
+      "https://raw.githubusercontent.com/shuriza/rekap_absensi/main/public/images/project-absensi.png",
+      "https://raw.githubusercontent.com/shuriza/rekap_absensi/main/public/images/project-rekap-bulanan.png",
+    ],
   },
   {
     id: "cosplaynesia",

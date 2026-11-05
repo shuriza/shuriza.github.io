@@ -32,6 +32,8 @@ The public [Project Lab](https://shuriza.tech/projects) is a curated catalog, no
 
 Projects that are not yet in the database are maintained in `src/lib/project-catalog.ts`. Server-side project loading merges that catalog with CMS rows, while client components consume only the framework-independent model and presentation data. This keeps the portfolio useful in a fresh build and prevents a missing database row from silently hiding a finished project.
 
+Flagship case studies can also render local or repository-hosted screenshots on their detail page. Screenshots are presented as evidence of the interface only; they do not imply a live production deployment.
+
 ## Tech Stack
 
 | Layer | Tech |

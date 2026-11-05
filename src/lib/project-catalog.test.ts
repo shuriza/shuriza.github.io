@@ -13,6 +13,16 @@ describe("project catalog", () => {
     expect(CURATED_PROJECTS.filter((project) => project.status === "live").every((project) => project.demo)).toBe(true);
   });
 
+  it("keeps visual evidence attached to flagship case studies", () => {
+    const flagshipIds = ["luncur", "rekap-absensi-dpmptsp"];
+    expect(
+      flagshipIds.every((id) => {
+        const project = CURATED_PROJECTS.find((candidate) => candidate.id === id);
+        return Boolean(project?.screenshots?.length);
+      }),
+    ).toBe(true);
+  });
+
   it("merges the catalog into existing CMS rows without duplicating titles", () => {
     const first = CURATED_PROJECTS[0];
     const merged = mergeCuratedProjects([

@@ -17,6 +17,15 @@ const contentSecurityPolicy = [
 
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
+        pathname: "/shuriza/rekap_absensi/main/public/images/**",
+      },
+    ],
+  },
   experimental: {
     // Admin forms contain text-only profile data; larger action bodies are never required.
     serverActions: { bodySizeLimit: "256kb" },

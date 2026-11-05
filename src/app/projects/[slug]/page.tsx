@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
@@ -137,20 +138,35 @@ export default async function ProjectDetailPage({
                   <h2 id="project-evidence" className="text-2xl font-semibold text-white">
                     Screenshot dan dokumentasi
                   </h2>
-                  <ul className="mt-5 space-y-3">
+                  <div className="mt-5 grid gap-5">
                     {project.screenshots.map((screenshot, index) => (
-                      <li key={screenshot}>
+                      <figure
+                        key={screenshot}
+                        className="overflow-hidden rounded-2xl border border-[#334155] bg-[#0f172a]"
+                      >
                         <a
                           href={screenshot}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-cyan-300 hover:text-cyan-200"
+                          aria-label={`Buka screenshot ${index + 1} ${project.title} ukuran penuh`}
+                          className="block"
                         >
-                          Buka bukti visual {index + 1}
+                          <div className="relative aspect-[16/10]">
+                            <Image
+                              src={screenshot}
+                              alt={`Screenshot ${index + 1} ${project.title}`}
+                              fill
+                              sizes="(max-width: 768px) 100vw, 760px"
+                              className="object-contain"
+                            />
+                          </div>
                         </a>
-                      </li>
+                        <figcaption className="border-t border-[#334155] px-4 py-3 text-sm text-slate-400">
+                          Bukti visual {index + 1} · klik untuk membuka ukuran penuh
+                        </figcaption>
+                      </figure>
                     ))}
-                  </ul>
+                  </div>
                 </section>
               )}
 
