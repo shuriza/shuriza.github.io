@@ -137,9 +137,9 @@ export const CURATED_PROJECTS: Project[] = [
     ],
     limitations: "Tidak ada data pegawai nyata yang dipublikasikan. Tinjauan dilakukan melalui source code, screenshot yang dianonimkan, dan case study.",
     screenshots: [
-      "https://raw.githubusercontent.com/shuriza/rekap_absensi/main/public/images/project-dashboard.png",
-      "https://raw.githubusercontent.com/shuriza/rekap_absensi/main/public/images/project-absensi.png",
-      "https://raw.githubusercontent.com/shuriza/rekap_absensi/main/public/images/project-rekap-bulanan.png",
+      "/project-evidence/rekap-dashboard.png",
+      "/project-evidence/rekap-absensi.png",
+      "/project-evidence/rekap-bulanan.png",
     ],
   },
   {
