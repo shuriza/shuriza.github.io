@@ -90,6 +90,9 @@ export const fallbackSkills: Skill[] = [
     ["Docker", "SiDocker", "#2496ED"],
     ["Vercel", "SiVercel", "#ffffff"],
     ["VS Code", "VscVscode", "#007ACC"],
+    ["AI API Integration", "TbApi", "#22d3ee"],
+    ["Workflow Automation", "TbApi", "#a78bfa"],
+    ["AI-assisted Development", "VscVscode", "#22d3ee"],
   ].map(([name, icon, color], index) => ({
     id: `tools-${index}`,
     name,

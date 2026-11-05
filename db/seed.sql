@@ -9,21 +9,21 @@ values (
   1,
   'M. Firdaus Suryaningrat',
   'Shuriza',
-  'Junior Laravel Developer',
-  'Lulusan D3 Manajemen Informatika dengan fokus pada pengembangan aplikasi web berbasis Laravel, PHP, MySQL, dan integrasi API.',
-  'Saya mengembangkan sistem rekap absensi untuk DPMPTSP Kota Kediri serta aplikasi manajemen tugas yang terintegrasi Google Classroom, Gemini AI, dan Telegram Bot. Saya juga tertarik dan sedang mendalami penerapan AI dalam pengembangan aplikasi web.',
+  'Junior Web Developer | AI Automation',
+  'Lulusan D3 Manajemen Informatika dengan fokus pada pengembangan aplikasi web berbasis Laravel, PHP, MySQL, integrasi AI/API, dan automasi alur kerja.',
+  'Saya mengembangkan sistem rekap absensi DPMPTSP, Todo AI dengan Gemini, Google Classroom, dan Telegram Bot, serta project pribadi untuk routing provider AI dan efisiensi token. Saya sedang memperdalam AI-assisted development, workflow automation, dan penerjemahan kebutuhan bisnis menjadi instruksi yang dapat diuji.',
   'Kediri, Jawa Timur',
-  'Laravel & API Integration',
+  'AI Automation & Laravel',
   'D3 Manajemen Informatika · IPK 3,63',
   'Terbuka untuk Magang',
   'firdausmfirdaus657@gmail.com',
   'https://github.com/shuriza',
   'https://www.linkedin.com/in/m-firdaus-suryaningrat-73a471338/',
   'https://shuriza.tech',
-  array['Laravel 12 · PHP · MySQL', 'REST API · OAuth · AI Integration', 'Blade · Alpine.js · Tailwind CSS'],
-  'Junior Laravel Developer dengan pengalaman membangun aplikasi operasional, integrasi API, autentikasi, dan laporan berbasis data.',
-  'Junior Web Developer | Laravel, PHP, MySQL',
-  'Lulusan D3 Manajemen Informatika Politeknik Negeri Malang (IPK 3,63) dengan pengalaman magang dan proyek mandiri dalam membangun aplikasi web menggunakan Laravel, PHP, dan MySQL. Dalam tim beranggotakan empat mahasiswa, mengembangkan sebagian besar alur sistem rekap absensi DPMPTSP Kota Kediri, termasuk impor dan validasi Excel, pengelolaan izin, dashboard analitik, serta laporan Excel/PDF, lalu mendemonstrasikannya kepada pengguna. Membangun pula aplikasi manajemen tugas dengan integrasi Google Classroom, Gemini AI, dan Telegram Bot. Memahami perancangan database, autentikasi, otorisasi, REST API, dan integrasi layanan pihak ketiga.',
+  array['AI Automation · Gemini · Telegram Bot', 'Laravel 12 · PHP · MySQL', 'Token/API Awareness · Workflow Automation'],
+  'Junior web developer dengan pengalaman membangun aplikasi operasional, integrasi AI/API, workflow automation, dan laporan berbasis data.',
+  'Junior Web Developer | AI Automation, Laravel',
+  'Lulusan D3 Manajemen Informatika Politeknik Negeri Malang (IPK 3,63) dengan pengalaman membangun aplikasi web dan automasi berbasis Laravel, PHP, MySQL, serta integrasi AI/API. Dalam tim empat mahasiswa, mengembangkan sebagian besar alur sistem rekap absensi DPMPTSP, termasuk impor dan validasi Excel, dashboard analitik, laporan Excel/PDF, dan demo kepada pengguna. Membangun Todo AI dengan Gemini, Google Classroom, dan Telegram Bot; mengembangkan 9Router untuk routing/fallback provider dan efisiensi token; serta merancang workflow n8n dengan approval Telegram. Sedang memperdalam AI agent, prompt design, pengujian respons, dan dokumentasi SOP.',
   array['Problem Solving', 'Kolaborasi Tim', 'Komunikasi', 'Manajemen Waktu'],
   '[{"name":"Bahasa Indonesia","level":"Native"},{"name":"English","level":"Basic"}]'::jsonb
 )
@@ -79,7 +79,10 @@ from (values
   ('00000000-0000-4000-8000-000000000113'::uuid, 'Git', 'Tools', 'SiGit', '#F05032', 0),
   ('00000000-0000-4000-8000-000000000114'::uuid, 'Docker', 'Tools', 'SiDocker', '#2496ED', 1),
   ('00000000-0000-4000-8000-000000000115'::uuid, 'Vercel', 'Tools', 'SiVercel', '#ffffff', 2),
-  ('00000000-0000-4000-8000-000000000116'::uuid, 'VS Code', 'Tools', 'VscVscode', '#007ACC', 3)
+  ('00000000-0000-4000-8000-000000000116'::uuid, 'VS Code', 'Tools', 'VscVscode', '#007ACC', 3),
+  ('00000000-0000-4000-8000-000000000117'::uuid, 'AI API Integration', 'Tools', 'TbApi', '#22d3ee', 4),
+  ('00000000-0000-4000-8000-000000000118'::uuid, 'Workflow Automation', 'Tools', 'TbApi', '#a78bfa', 5),
+  ('00000000-0000-4000-8000-000000000119'::uuid, 'AI-assisted Development', 'Tools', 'VscVscode', '#22d3ee', 6)
 ) as seed(id, name, category, icon, color, sort_order)
 where not exists (
   select 1 from public.skills existing where existing.name = seed.name and existing.category = seed.category

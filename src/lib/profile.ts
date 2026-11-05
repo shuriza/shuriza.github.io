@@ -39,13 +39,13 @@ export const fallbackProfile: Profile = {
   id: 1,
   display_name: "M. Firdaus Suryaningrat",
   short_name: "Shuriza",
-  role: "Junior Laravel Developer",
+  role: "Junior Web Developer | AI Automation",
   bio_primary:
-    "Lulusan D3 Manajemen Informatika dengan fokus pada pengembangan aplikasi web berbasis Laravel, PHP, MySQL, dan integrasi API.",
+    "Lulusan D3 Manajemen Informatika dengan fokus pada pengembangan aplikasi web berbasis Laravel, PHP, MySQL, integrasi AI/API, dan automasi alur kerja.",
   bio_secondary:
-    "Saya mengembangkan sistem rekap absensi untuk DPMPTSP Kota Kediri serta aplikasi manajemen tugas yang terintegrasi Google Classroom, Gemini AI, dan Telegram Bot. Saya juga tertarik dan sedang mendalami penerapan AI dalam pengembangan aplikasi web.",
+    "Saya mengembangkan sistem rekap absensi DPMPTSP, Todo AI dengan Gemini, Google Classroom, dan Telegram Bot, serta project pribadi untuk routing provider AI dan efisiensi token. Saya sedang memperdalam AI-assisted development, workflow automation, dan penerjemahan kebutuhan bisnis menjadi instruksi yang dapat diuji.",
   location: "Kediri, Jawa Timur",
-  focus: "Laravel & API Integration",
+  focus: "AI Automation & Laravel",
   education: "D3 Manajemen Informatika · IPK 3,63",
   status: "Terbuka untuk Magang",
   email: "firdausmfirdaus657@gmail.com",
@@ -53,15 +53,15 @@ export const fallbackProfile: Profile = {
   linkedin: "https://www.linkedin.com/in/m-firdaus-suryaningrat-73a471338/",
   website: "https://shuriza.tech",
   hero_roles: [
+    "AI Automation · Gemini · Telegram Bot",
     "Laravel 12 · PHP · MySQL",
-    "REST API · OAuth · AI Integration",
-    "Blade · Alpine.js · Tailwind CSS",
+    "Token/API Awareness · Workflow Automation",
   ],
   hero_description:
-    "Junior Laravel Developer dengan pengalaman membangun aplikasi operasional, integrasi API, autentikasi, dan laporan berbasis data.",
-  cv_headline: "Junior Web Developer | Laravel, PHP, MySQL",
+    "Junior web developer dengan pengalaman membangun aplikasi operasional, integrasi AI/API, workflow automation, dan laporan berbasis data.",
+  cv_headline: "Junior Web Developer | AI Automation, Laravel",
   cv_summary:
-    "Lulusan D3 Manajemen Informatika Politeknik Negeri Malang (IPK 3,63) dengan pengalaman magang dan proyek mandiri dalam membangun aplikasi web menggunakan Laravel, PHP, dan MySQL. Dalam tim beranggotakan empat mahasiswa, mengembangkan sebagian besar alur sistem rekap absensi DPMPTSP Kota Kediri, termasuk impor dan validasi Excel, pengelolaan izin, dashboard analitik, serta laporan Excel/PDF, lalu mendemonstrasikannya kepada pengguna. Membangun pula aplikasi manajemen tugas dengan integrasi Google Classroom, Gemini AI, dan Telegram Bot. Memahami perancangan database, autentikasi, otorisasi, REST API, dan integrasi layanan pihak ketiga.",
+    "Lulusan D3 Manajemen Informatika Politeknik Negeri Malang (IPK 3,63) dengan pengalaman membangun aplikasi web dan automasi berbasis Laravel, PHP, MySQL, serta integrasi AI/API. Dalam tim empat mahasiswa, mengembangkan sebagian besar alur sistem rekap absensi DPMPTSP, termasuk impor dan validasi Excel, dashboard analitik, laporan Excel/PDF, dan demo kepada pengguna. Membangun Todo AI dengan Gemini, Google Classroom, dan Telegram Bot; mengembangkan 9Router untuk routing/fallback provider dan efisiensi token; serta merancang workflow n8n dengan approval Telegram. Sedang memperdalam AI agent, prompt design, pengujian respons, dan dokumentasi SOP.",
   soft_skills: ["Problem Solving", "Kolaborasi Tim", "Komunikasi", "Manajemen Waktu"],
   languages: [
     { name: "Bahasa Indonesia", level: "Native" },

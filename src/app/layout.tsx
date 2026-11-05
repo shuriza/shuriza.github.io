@@ -10,15 +10,18 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://shuriza.tech"),
   title: {
-    default: "M. Firdaus Suryaningrat | Junior Fullstack Web Developer",
+    default: "M. Firdaus Suryaningrat | Junior Web Developer & AI Automation",
     template: "%s | Shuriza",
   },
   description:
-    "Portfolio M. Firdaus Suryaningrat (Shuriza), junior fullstack web developer dari Kediri.",
+    "Portfolio M. Firdaus Suryaningrat, junior web developer dari Kediri dengan pengalaman Laravel, AI integration, dan workflow automation.",
   keywords: [
     "M. Firdaus Suryaningrat",
     "Shuriza",
-    "junior fullstack web developer",
+    "junior web developer",
+    "AI automation",
+    "AI integration",
+    "workflow automation",
     "React",
     "Next.js",
     "Laravel",
@@ -26,8 +29,8 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "M. Firdaus Suryaningrat" }],
   openGraph: {
-    title: "M. Firdaus Suryaningrat | Junior Fullstack Web Developer",
-    description: "Portfolio web developer dari Kediri, Jawa Timur.",
+    title: "M. Firdaus Suryaningrat | Junior Web Developer & AI Automation",
+    description: "Portfolio web developer dari Kediri dengan project AI integration dan workflow automation.",
     type: "website",
     url: "/",
     siteName: "Shuriza",
