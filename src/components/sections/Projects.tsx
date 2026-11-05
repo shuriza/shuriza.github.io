@@ -134,6 +134,11 @@ export default function Projects({ projects, compact = false }: { projects: Proj
   const visibleProjects = compact ? filteredProjects.slice(0, 6) : filteredProjects;
   const liveCount = projects.filter((project) => project.status === "live").length;
   const caseStudyCount = projects.filter((project) => project.status === "case-study").length;
+  const availableFilters = filters.filter(
+    (filter) =>
+      filter.value === "all" ||
+      projects.some((project) => project.category === filter.value || project.status === filter.value),
+  );
 
   return (
     <section id="projects" className="relative overflow-hidden px-6 py-24">
@@ -147,7 +152,7 @@ export default function Projects({ projects, compact = false }: { projects: Proj
             </h2>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-400">
               Setiap project punya bentuk bukti yang berbeda: live demo, source code,
-              hosted sandbox, atau case study yang menjelaskan batas aksesnya.
+              screenshot, atau case study yang menjelaskan batas aksesnya.
             </p>
           </div>
           {compact && (
@@ -177,7 +182,7 @@ export default function Projects({ projects, compact = false }: { projects: Proj
 
         {!compact && (
           <div className="mb-10 flex flex-wrap gap-2" role="group" aria-label="Filter project">
-            {filters.map((filter) => (
+            {availableFilters.map((filter) => (
               <button
                 key={filter.value}
                 type="button"

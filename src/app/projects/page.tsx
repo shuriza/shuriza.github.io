@@ -8,7 +8,7 @@ import { getSiteSettings } from "@/lib/settings-server";
 
 export const metadata: Metadata = {
   title: "Project Lab",
-  description: "Katalog project Shuriza dengan live demo, source code, hosted demo, dan case study.",
+  description: "Katalog project Shuriza dengan live demo, source code, screenshot, dan case study.",
 };
 
 export default async function ProjectsPage() {
