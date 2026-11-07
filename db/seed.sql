@@ -11,7 +11,7 @@ values (
   'Shuriza',
   'Junior Web Developer | AI Automation',
   'Lulusan D3 Manajemen Informatika dengan fokus pada pengembangan aplikasi web berbasis Laravel, PHP, MySQL, integrasi AI/API, dan automasi alur kerja.',
-  'Saya mengembangkan sistem rekap absensi DPMPTSP, Todo AI dengan Gemini, Google Classroom, dan Telegram Bot, serta project pribadi untuk routing provider AI dan efisiensi token. Saya sedang memperdalam AI-assisted development, workflow automation, dan penerjemahan kebutuhan bisnis menjadi instruksi yang dapat diuji.',
+  'Saya mengembangkan sistem rekap absensi DPMPTSP, Todo AI dengan Gemini, Google Classroom, dan Telegram Bot, serta Shuriza Store dengan otomasi bot WhatsApp dan Telegram. Saya sedang memperdalam AI-assisted development, workflow automation, dan penerjemahan kebutuhan bisnis menjadi instruksi yang dapat diuji.',
   'Kediri, Jawa Timur',
   'AI Automation & Laravel',
   'D3 Manajemen Informatika · IPK 3,63',
@@ -23,7 +23,7 @@ values (
   array['AI Automation · Gemini · Telegram Bot', 'Laravel 12 · PHP · MySQL', 'Token/API Awareness · Workflow Automation'],
   'Junior web developer dengan pengalaman membangun aplikasi operasional, integrasi AI/API, workflow automation, dan laporan berbasis data.',
   'Junior Web Developer | AI Automation, Laravel',
-  'Lulusan D3 Manajemen Informatika Politeknik Negeri Malang (IPK 3,63) dengan pengalaman membangun aplikasi web dan automasi berbasis Laravel, PHP, MySQL, serta integrasi AI/API. Dalam tim empat mahasiswa, mengembangkan sebagian besar alur sistem rekap absensi DPMPTSP, termasuk impor dan validasi Excel, dashboard analitik, laporan Excel/PDF, dan demo kepada pengguna. Membangun Todo AI dengan Gemini, Google Classroom, dan Telegram Bot; membangun Shuriza Store sebagai e-commerce produk digital dengan checkout guest, multi-gateway payment, sinkronisasi stok, serta otomasi bot WhatsApp dan Telegram; dan mengembangkan 9Router untuk routing/fallback provider serta efisiensi token. Sedang memperdalam AI agent, prompt design, pengujian respons, dan dokumentasi SOP.',
+  'Lulusan D3 Manajemen Informatika Politeknik Negeri Malang (IPK 3,63) dengan pengalaman membangun aplikasi web dan automasi berbasis Laravel, PHP, MySQL, serta integrasi AI/API. Dalam tim empat mahasiswa, mengembangkan sebagian besar alur sistem rekap absensi DPMPTSP, termasuk impor dan validasi Excel, dashboard analitik, laporan Excel/PDF, dan demo kepada pengguna. Membangun Todo AI dengan Gemini, Google Classroom, dan Telegram Bot; membangun Shuriza Store sebagai e-commerce produk digital dengan checkout guest, multi-gateway payment, sinkronisasi stok, serta otomasi bot WhatsApp dan Telegram. Sedang memperdalam AI agent, prompt design, pengujian respons, dan dokumentasi SOP.',
   array['Problem Solving', 'Kolaborasi Tim', 'Komunikasi', 'Manajemen Waktu'],
   '[{"name":"Bahasa Indonesia","level":"Native"},{"name":"English","level":"Basic"}]'::jsonb
 )

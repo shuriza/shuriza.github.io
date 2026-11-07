@@ -80,8 +80,7 @@ export default async function CVPage() {
   const cvProjectOrder: Record<string, number> = {
     "Sistem Rekap Absensi DPMPTSP": 0,
     "Todo AI": 1,
-    "9Router": 2,
-    "Shuriza Store": 3,
+    "Shuriza Store": 2,
   };
   const cvProjects = projects
     .filter((project) => cvProjectOrder[project.title] !== undefined)
