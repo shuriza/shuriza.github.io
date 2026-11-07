@@ -256,7 +256,7 @@ export const CURATED_PROJECTS: Project[] = [
     id: "shuriza-store",
     title: "Shuriza Store",
     description:
-      "Platform e-commerce produk digital dengan checkout guest, multi-gateway payment, sinkronisasi stok supplier, dan otomasi fulfillment.",
+      "Platform e-commerce produk digital dengan checkout guest, multi-gateway payment, sinkronisasi stok supplier, serta otomasi bot WhatsApp dan Telegram untuk alur order dan fulfillment.",
     tech: ["Laravel 12", "MySQL", "Blade", "Tailwind CSS", "Payment Gateway", "Bot Automation"],
     github: null,
     demo: "https://shurizastore.biz.id/",

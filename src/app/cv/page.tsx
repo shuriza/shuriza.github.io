@@ -81,7 +81,7 @@ export default async function CVPage() {
     "Sistem Rekap Absensi DPMPTSP": 0,
     "Todo AI": 1,
     "9Router": 2,
-    "Carte — Affiliate Content Studio": 3,
+    "Shuriza Store": 3,
   };
   const cvProjects = projects
     .filter((project) => cvProjectOrder[project.title] !== undefined)
