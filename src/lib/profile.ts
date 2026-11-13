@@ -73,7 +73,6 @@ export const fallbackProfile: Profile = {
   linkedin: "https://www.linkedin.com/in/m-firdaus-suryaningrat-73a471338/",
   website: "https://shuriza.tech",
   hero_roles: [
-    "Laravel 12 · PHP · MySQL",
     "Token/API Awareness · Workflow Automation",
   ],
   hero_description:

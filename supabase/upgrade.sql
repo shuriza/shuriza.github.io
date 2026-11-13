@@ -195,7 +195,11 @@ set
   bio_primary = 'Lulusan D3 Manajemen Informatika dengan fokus pada pengembangan aplikasi web berbasis Laravel, PHP, MySQL, dan integrasi API.',
   bio_secondary = 'Saya mengembangkan sistem rekap absensi untuk DPMPTSP Kota Kediri serta aplikasi manajemen tugas yang terintegrasi Google Classroom, Gemini AI, dan Telegram Bot. Saya juga tertarik dan sedang mendalami penerapan AI dalam pengembangan aplikasi web.',
   hero_description = 'Junior Laravel Developer dengan pengalaman membangun aplikasi operasional, integrasi API, autentikasi, dan laporan berbasis data.',
-  hero_roles = array['Laravel 12 · PHP · MySQL', 'REST API · OAuth · AI Integration', 'Blade · Alpine.js · Tailwind CSS']
+  hero_roles = array['REST API · OAuth · AI Integration', 'Blade · Alpine.js · Tailwind CSS']
+where id = 1;
+
+update public.profile
+set hero_roles = array_remove(hero_roles, 'Laravel 12 · PHP · MySQL')
 where id = 1;
 
 update public.projects

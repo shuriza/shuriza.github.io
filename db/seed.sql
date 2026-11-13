@@ -22,7 +22,7 @@ values (
   'https://github.com/shuriza',
   'https://www.linkedin.com/in/m-firdaus-suryaningrat-73a471338/',
   'https://shuriza.tech',
-  array['Laravel 12 · PHP · MySQL', 'Token/API Awareness · Workflow Automation'],
+  array['Token/API Awareness · Workflow Automation'],
   'Junior web developer dengan pengalaman membangun aplikasi operasional, integrasi AI/API, workflow automation, dan laporan berbasis data.',
   'Junior Web Developer | AI Automation, Laravel',
   'Lulusan D3 Manajemen Informatika Politeknik Negeri Malang (IPK 3,63) dengan pengalaman membangun aplikasi web dan automasi berbasis Laravel, PHP, MySQL, serta integrasi AI/API. Dalam tim empat mahasiswa, mengembangkan sebagian besar alur sistem rekap absensi DPMPTSP, termasuk impor dan validasi Excel, dashboard analitik, laporan Excel/PDF, dan demo kepada pengguna. Membangun Todo AI dengan Gemini, Google Classroom, dan Telegram Bot; membangun Shuriza Store sebagai e-commerce produk digital dengan checkout guest, multi-gateway payment, sinkronisasi stok, serta otomasi bot WhatsApp dan Telegram. Sedang memperdalam AI agent, prompt design, pengujian respons, dan dokumentasi SOP.',
