@@ -96,6 +96,10 @@ set
   website = 'https://shuriza.tech'
 where id = 1;
 
+update public.profile
+set hero_roles = array_remove(hero_roles, 'AI Automation · Gemini · Telegram Bot')
+where id = 1;
+
 -- ============================================================
 -- Stable project identity + editable case-study/CV content.
 -- ============================================================
