@@ -4,11 +4,21 @@ create extension if not exists pgcrypto;
 
 create table if not exists public.projects (
   id uuid primary key default gen_random_uuid(),
+  catalog_key text,
   title text not null check (char_length(title) between 1 and 120),
   description text not null check (char_length(description) between 1 and 1000),
   tech text[] not null default '{}',
   github text,
   demo text,
+  slug text,
+  status text check (status in ('live', 'hosted', 'video', 'case-study', 'private')),
+  category text check (category in ('web', 'laravel', 'mobile-desktop', 'ai-automation', 'case-study')),
+  role text,
+  problem text,
+  features text[] not null default '{}',
+  limitations text,
+  video text,
+  screenshots text[] not null default '{}',
   featured boolean not null default false,
   published boolean not null default true,
   sort_order integer not null default 0,
@@ -40,6 +50,7 @@ create table if not exists public.profile (
   education text not null,
   status text not null,
   email text not null,
+  phone text not null default '',
   github text not null,
   linkedin text not null,
   website text not null,
@@ -47,6 +58,9 @@ create table if not exists public.profile (
   hero_description text not null,
   cv_headline text not null default '',
   cv_summary text not null default '',
+  cv_experiences jsonb not null default '[]'::jsonb,
+  cv_education jsonb not null default '[]'::jsonb,
+  cv_project_keys text[] not null default '{}',
   soft_skills text[] not null default '{}',
   languages jsonb not null default '[]'::jsonb,
   updated_at timestamptz not null default now()
@@ -93,5 +107,13 @@ drop trigger if exists site_settings_set_updated_at on public.site_settings;
 create trigger site_settings_set_updated_at
 before update on public.site_settings
 for each row execute function public.set_updated_at();
+
+create unique index if not exists projects_catalog_key_unique
+  on public.projects (catalog_key)
+  where catalog_key is not null;
+
+create unique index if not exists projects_slug_unique
+  on public.projects (slug)
+  where slug is not null;
 
 commit;

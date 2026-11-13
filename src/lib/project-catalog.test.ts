@@ -37,8 +37,25 @@ describe("project catalog", () => {
 
     expect(merged).toHaveLength(CURATED_PROJECTS.length);
     expect(merged.filter((project) => project.title === first.title)).toHaveLength(1);
-    expect(merged[0].description).toBe(first.description);
-    expect(merged[0].github).toBe(first.github);
+    expect(merged[0].description).toBe("Deskripsi lama dari CMS");
+    expect(merged[0].github).toBe("https://github.com/example/private");
+    expect(merged[0].catalog_key).toBe(first.id);
+  });
+
+  it("keeps a curated project linked after its CMS title changes", () => {
+    const first = CURATED_PROJECTS[0];
+    const merged = mergeCuratedProjects([
+      {
+        ...first,
+        id: "00000000-0000-4000-8000-000000000001",
+        catalog_key: first.id,
+        title: "Nama baru yang tetap stabil",
+        published: true,
+      },
+    ]);
+
+    expect(merged.filter((project) => project.catalog_key === first.id)).toHaveLength(1);
+    expect(merged.find((project) => project.catalog_key === first.id)?.title).toBe("Nama baru yang tetap stabil");
   });
 
   it("keeps archived repositories as external evidence links", () => {

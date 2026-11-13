@@ -4,6 +4,7 @@ import { updateSettings } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
 import { getAdminSettings } from "@/lib/db/queries";
 import { FEATURE_TOGGLES, resolveSettings } from "@/lib/settings";
+import SubmitButton from "@/components/SubmitButton";
 
 
 export const metadata: Metadata = {
@@ -85,9 +86,7 @@ export default async function AdminSettingsPage({
             ))}
           </ul>
 
-          <button className="mt-6 rounded-lg bg-cyan-500 px-5 py-3 font-semibold text-[#0a0a0f] hover:bg-cyan-400">
-            Simpan pengaturan
-          </button>
+          <div className="mt-6"><SubmitButton>Simpan pengaturan</SubmitButton></div>
           </form>
         )}
       </div>

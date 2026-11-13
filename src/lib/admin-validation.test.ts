@@ -33,6 +33,7 @@ const validProfile = {
   education: "D3 Manajemen Informatika",
   status: "Open to work",
   email: "firdaus@example.com",
+  phone: "0817-7509-3906",
   github: "https://github.com/shuriza",
   linkedin: "https://www.linkedin.com/in/m-firdaus-suryaningrat-73a471338/",
   website: "https://shuriza.tech",
@@ -55,9 +56,40 @@ describe("admin validation", () => {
     });
   });
 
+  it("accepts case-study fields and normalizes their line-based input", () => {
+    const project = readProjectInput(
+      formData({
+        ...validProject,
+        slug: "portfolio-lab",
+        status: "case-study",
+        category: "web",
+        role: "Developer utama",
+        problem: "Masalah operasional yang perlu diringkas.",
+        features: "Import data\nDashboard analitik",
+        limitations: "Data asli tidak dipublikasikan.",
+        video: "https://example.com/demo",
+        screenshots: "/project-evidence/dashboard.png\n/project-evidence/detail.png",
+      }),
+    );
+
+    expect(project).toMatchObject({
+      slug: "portfolio-lab",
+      status: "case-study",
+      category: "web",
+      features: ["Import data", "Dashboard analitik"],
+      screenshots: ["/project-evidence/dashboard.png", "/project-evidence/detail.png"],
+    });
+  });
+
   it("rejects non-HTTPS project URLs", () => {
     expect(() => readProjectInput(formData({ ...validProject, demo: "javascript:alert(1)" }))).toThrow(
       AdminValidationError,
+    );
+  });
+
+  it("requires evidence for a video demo status", () => {
+    expect(() => readProjectInput(formData({ ...validProject, status: "video" }))).toThrow(
+      "Status Video Demo membutuhkan Video URL.",
     );
   });
 

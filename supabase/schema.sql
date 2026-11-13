@@ -7,11 +7,21 @@ create table public.admin_users (
 
 create table public.projects (
   id uuid primary key default gen_random_uuid(),
+  catalog_key text,
   title text not null check (char_length(title) between 1 and 120),
   description text not null check (char_length(description) between 1 and 1000),
   tech text[] not null default '{}',
   github text,
   demo text,
+  slug text,
+  status text check (status in ('live', 'hosted', 'video', 'case-study', 'private')),
+  category text check (category in ('web', 'laravel', 'mobile-desktop', 'ai-automation', 'case-study')),
+  role text,
+  problem text,
+  features text[] not null default '{}',
+  limitations text,
+  video text,
+  screenshots text[] not null default '{}',
   featured boolean not null default false,
   published boolean not null default true,
   sort_order integer not null default 0,
@@ -110,6 +120,7 @@ create table if not exists public.profile (
   education text not null,
   status text not null,
   email text not null,
+  phone text not null default '',
   github text not null,
   linkedin text not null,
   website text not null,
@@ -120,6 +131,10 @@ create table if not exists public.profile (
 
 alter table public.skills enable row level security;
 alter table public.profile enable row level security;
+
+alter table public.profile add column if not exists cv_experiences jsonb not null default '[]'::jsonb;
+alter table public.profile add column if not exists cv_education jsonb not null default '[]'::jsonb;
+alter table public.profile add column if not exists cv_project_keys text[] not null default '{}';
 
 do $$
 begin

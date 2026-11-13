@@ -31,4 +31,28 @@ describe("normalizeProfile", () => {
   it("replaces database placeholder text with the verified fallback", () => {
     expect(normalizeProfile({ display_name: "-" }).display_name).toBe(fallbackProfile.display_name);
   });
+
+  it("normalizes editable CV content while rejecting malformed entries", () => {
+    const profile = normalizeProfile({
+      phone: "+62 817 7509 3906",
+      cv_experiences: [
+        {
+          title: "Developer",
+          company: "Studio",
+          location: "Kediri",
+          period: "2026",
+          bullets: ["Membangun fitur."],
+        },
+      ],
+      cv_education: [
+        { title: "D3", institution: "Politeknik", period: "2023 - 2026", description: "Software." },
+      ],
+      cv_project_keys: ["portfolio-lab"],
+    });
+
+    expect(profile.phone).toBe("+62 817 7509 3906");
+    expect(profile.cv_experiences).toHaveLength(1);
+    expect(profile.cv_education).toHaveLength(1);
+    expect(profile.cv_project_keys).toEqual(["portfolio-lab"]);
+  });
 });

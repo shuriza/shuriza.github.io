@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { getPublicProjects } from "@/lib/db/queries";
-import { type Project } from "@/lib/project-model";
+import { isProjectCategory, isProjectStatus, type Project } from "@/lib/project-model";
 import { CURATED_PROJECTS } from "@/lib/project-catalog";
 
 export { PROJECT_CATEGORY_LABELS, PROJECT_STATUS_LABELS } from "@/lib/project-model";
@@ -9,6 +9,7 @@ export type { Project, ProjectCategory, ProjectStatus } from "@/lib/project-mode
 
 export const PROJECTS_CACHE_TAG = "public-projects";
 
+const curatedByKey = new Map(CURATED_PROJECTS.map((project) => [project.id, project]));
 const curatedByTitle = new Map(CURATED_PROJECTS.map((project) => [project.title, project]));
 
 export function slugifyProjectTitle(title: string) {
@@ -21,13 +22,14 @@ export function slugifyProjectTitle(title: string) {
 }
 
 export function enrichProject(project: Project): Project {
-  const curated = curatedByTitle.get(project.title);
+  const curated = (project.catalog_key ? curatedByKey.get(project.catalog_key) : undefined) ?? curatedByTitle.get(project.title);
   if (!curated) {
     return {
       ...project,
-      slug: project.slug ?? slugifyProjectTitle(project.title),
-      status: project.status ?? (project.demo ? "live" : "private"),
-      category: project.category ?? "case-study",
+      catalog_key: project.catalog_key,
+      slug: project.slug ?? (slugifyProjectTitle(project.title) || project.id),
+      status: isProjectStatus(project.status) ? project.status : project.demo ? "live" : "private",
+      category: isProjectCategory(project.category) ? project.category : "case-study",
       features: project.features ?? [],
       screenshots: project.screenshots ?? [],
       video: project.video ?? null,
@@ -35,30 +37,35 @@ export function enrichProject(project: Project): Project {
   }
 
   return {
+    ...curated,
     ...project,
-    description: curated.description,
-    tech: curated.tech,
-    github: curated.github,
-    demo: curated.demo,
-    featured: curated.featured,
+    catalog_key: project.catalog_key ?? curated.id,
+    description: project.description?.trim() || curated.description,
+    tech: project.tech?.length ? project.tech : curated.tech,
+    github: project.github ?? curated.github,
+    demo: project.demo ?? curated.demo,
     published: project.published,
-    sort_order: curated.sort_order,
-    slug: project.slug ?? curated.slug ?? slugifyProjectTitle(curated.title),
-    status: curated.status,
-    category: curated.category,
-    problem: curated.problem,
-    role: curated.role,
-    features: curated.features,
-    limitations: curated.limitations,
-    video: curated.video ?? null,
-    screenshots: curated.screenshots ?? [],
+    featured: project.featured,
+    sort_order: project.sort_order,
+    slug: project.slug ?? curated.slug ?? (slugifyProjectTitle(curated.title) || curated.id),
+    status: isProjectStatus(project.status) ? project.status : curated.status,
+    category: isProjectCategory(project.category) ? project.category : curated.category,
+    problem: project.problem?.trim() || curated.problem,
+    role: project.role?.trim() || curated.role,
+    features: project.features?.length ? project.features : curated.features ?? [],
+    limitations: project.limitations?.trim() || curated.limitations,
+    video: project.video ?? curated.video ?? null,
+    screenshots: project.screenshots?.length ? project.screenshots : curated.screenshots ?? [],
   };
 }
 
 export function mergeCuratedProjects(projects: Project[]): Project[] {
   const normalized = projects.map(enrichProject);
+  const knownCatalogKeys = new Set(normalized.map((project) => project.catalog_key).filter(Boolean));
   const knownTitles = new Set(normalized.map((project) => project.title));
-  const additions = CURATED_PROJECTS.filter((project) => !knownTitles.has(project.title)).map(enrichProject);
+  const additions = CURATED_PROJECTS
+    .filter((project) => !knownCatalogKeys.has(project.id) && !knownTitles.has(project.title))
+    .map(enrichProject);
 
   return [...normalized, ...additions]
     .filter((project) => project.published)

@@ -5,7 +5,7 @@ import ProjectForm from "@/app/admin/projects/ProjectForm";
 import { requireAdmin } from "@/lib/admin";
 import { getAdminProject } from "@/lib/db/queries";
 import { isUuid } from "@/lib/admin-validation";
-import type { Project } from "@/lib/projects";
+import { enrichProject, type Project } from "@/lib/projects";
 
 
 export default async function EditProjectPage({
@@ -38,12 +38,14 @@ export default async function EditProjectPage({
   }
   if (!data) notFound();
 
+  const editableProject = enrichProject(data as Project);
+
   return (
     <main className="min-h-screen bg-[#0a0a0f] px-6 py-10 text-slate-200">
       <div className="mx-auto max-w-3xl">
         <Link href="/admin/projects" className="text-sm text-slate-400 hover:text-cyan-400">&larr; Semua project</Link>
         <h1 className="mb-8 mt-6 text-3xl font-bold text-white">Edit project</h1>
-        <ProjectForm action={updateProject} project={data as Project} error={error} />
+          <ProjectForm action={updateProject} project={editableProject} error={error} />
       </div>
     </main>
   );

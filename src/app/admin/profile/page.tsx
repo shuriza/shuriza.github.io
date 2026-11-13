@@ -2,7 +2,8 @@ import AdminNav from "@/app/admin/AdminNav";
 import { updateProfile } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
 import { getAdminProfile } from "@/lib/db/queries";
-import { parseEditableProfile } from "@/lib/profile";
+import { formatCvEducation, formatCvExperiences, parseEditableProfile } from "@/lib/profile";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function AdminProfilePage({
   searchParams,
@@ -73,6 +74,7 @@ export default async function AdminProfilePage({
               <label className="block text-sm text-slate-300">Hero roles <span className="text-slate-500">(satu role per baris)</span><textarea name="hero_roles" required rows={5} defaultValue={profile.hero_roles.join("\n")} className="admin-input resize-y" /></label>
               <div className="grid gap-6 sm:grid-cols-2">
                 <label className="block text-sm text-slate-300">Email<input name="email" type="email" required defaultValue={profile.email} className="admin-input" /></label>
+                <label className="block text-sm text-slate-300">Nomor telepon<input name="phone" required defaultValue={profile.phone} className="admin-input" /></label>
                 <label className="block text-sm text-slate-300">Website URL<input name="website" type="url" required defaultValue={profile.website} className="admin-input" /></label>
                 <label className="block text-sm text-slate-300">GitHub URL<input name="github" type="url" required defaultValue={profile.github} className="admin-input" /></label>
                 <label className="block text-sm text-slate-300">LinkedIn URL<input name="linkedin" type="url" required defaultValue={profile.linkedin} className="admin-input" /></label>
@@ -89,12 +91,27 @@ export default async function AdminProfilePage({
             <div className="space-y-5">
               <label className="block text-sm text-slate-300">Headline CV<input name="cv_headline" required defaultValue={profile.cv_headline} className="admin-input" /></label>
               <label className="block text-sm text-slate-300">Ringkasan CV<textarea name="cv_summary" required rows={4} defaultValue={profile.cv_summary} className="admin-input resize-y" /></label>
+              <label className="block text-sm text-slate-300">
+                Pengalaman CV
+                <span className="mt-1 block text-xs text-slate-500">Satu blok per pengalaman. Header: Jabatan | Perusahaan | Lokasi | Periode, lalu bullet per baris. Pisahkan blok dengan baris kosong.</span>
+                <textarea name="cv_experiences" rows={10} defaultValue={formatCvExperiences(profile.cv_experiences)} className="admin-input resize-y" />
+              </label>
+              <label className="block text-sm text-slate-300">
+                Pendidikan CV
+                <span className="mt-1 block text-xs text-slate-500">Satu blok per pendidikan. Header: Pendidikan | Institusi | Periode, lalu deskripsi opsional. Pisahkan blok dengan baris kosong.</span>
+                <textarea name="cv_education" rows={7} defaultValue={formatCvEducation(profile.cv_education)} className="admin-input resize-y" />
+              </label>
+              <label className="block text-sm text-slate-300">
+                Project yang tampil di CV
+                <span className="mt-1 block text-xs text-slate-500">Satu catalog key atau slug per baris, mengikuti urutan tampil.</span>
+                <textarea name="cv_project_keys" rows={4} defaultValue={profile.cv_project_keys.join("\n")} className="admin-input resize-y" />
+              </label>
               <label className="block text-sm text-slate-300">Soft skills <span className="text-slate-500">(satu per baris)</span><textarea name="soft_skills" rows={4} defaultValue={profile.soft_skills.join("\n")} className="admin-input resize-y" /></label>
               <label className="block text-sm text-slate-300">Bahasa <span className="text-slate-500">(satu per baris, format: Nama | Level)</span><textarea name="languages" rows={3} defaultValue={profile.languages.map((language) => `${language.name} | ${language.level}`).join("\n")} className="admin-input resize-y" /></label>
             </div>
           </section>
 
-          <button className="rounded-lg bg-cyan-500 px-5 py-3 font-semibold text-[#0a0a0f] hover:bg-cyan-400">Simpan profile</button>
+          <SubmitButton>Simpan profile</SubmitButton>
         </form>
         )}
       </div>

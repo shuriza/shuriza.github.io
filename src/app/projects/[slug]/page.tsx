@@ -22,10 +22,30 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const project = await getProjectBySlug((await params).slug);
+  const slug = (await params).slug;
+  const project = await getProjectBySlug(slug);
   return project
-    ? { title: `${project.title} | Shuriza`, description: project.description }
-    : { title: "Project tidak ditemukan | Shuriza" };
+    ? {
+        title: project.title,
+        description: project.description,
+        alternates: { canonical: `/projects/${project.slug ?? slug}` },
+        openGraph: {
+          title: project.title,
+          description: project.description,
+          url: `/projects/${project.slug ?? slug}`,
+          type: "article",
+          siteName: "Shuriza",
+          locale: "id_ID",
+          images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: project.title,
+          description: project.description,
+          images: ["/opengraph-image"],
+        },
+      }
+    : { title: "Project tidak ditemukan" };
 }
 
 function statusClass(status: string) {

@@ -29,11 +29,21 @@ async function safeQuery<T>(fallback: T, query: () => Promise<T>) {
 function publicProjectSelection() {
   return {
     id: projects.id,
+    catalog_key: projects.catalog_key,
     title: projects.title,
     description: projects.description,
     tech: projects.tech,
     github: projects.github,
     demo: projects.demo,
+    slug: projects.slug,
+    status: projects.status,
+    category: projects.category,
+    role: projects.role,
+    problem: projects.problem,
+    features: projects.features,
+    limitations: projects.limitations,
+    video: projects.video,
+    screenshots: projects.screenshots,
     featured: projects.featured,
     published: projects.published,
     sort_order: projects.sort_order,
@@ -65,6 +75,7 @@ function publicProfileSelection() {
     education: profile.education,
     status: profile.status,
     email: profile.email,
+    phone: profile.phone,
     github: profile.github,
     linkedin: profile.linkedin,
     website: profile.website,
@@ -72,6 +83,9 @@ function publicProfileSelection() {
     hero_description: profile.hero_description,
     cv_headline: profile.cv_headline,
     cv_summary: profile.cv_summary,
+    cv_experiences: profile.cv_experiences,
+    cv_education: profile.cv_education,
+    cv_project_keys: profile.cv_project_keys,
     soft_skills: profile.soft_skills,
     languages: profile.languages,
   };
@@ -187,7 +201,23 @@ export async function getAdminSettings() {
 
 export type ProjectWriteInput = Pick<
   ProjectInsert,
-  "title" | "description" | "tech" | "github" | "demo" | "featured" | "published" | "sort_order"
+  | "title"
+  | "description"
+  | "tech"
+  | "github"
+  | "demo"
+  | "slug"
+  | "status"
+  | "category"
+  | "role"
+  | "problem"
+  | "features"
+  | "limitations"
+  | "video"
+  | "screenshots"
+  | "featured"
+  | "published"
+  | "sort_order"
 >;
 
 export type SkillWriteInput = Pick<
@@ -207,6 +237,7 @@ export type ProfileWriteInput = Pick<
   | "education"
   | "status"
   | "email"
+  | "phone"
   | "github"
   | "linkedin"
   | "website"
@@ -214,6 +245,9 @@ export type ProfileWriteInput = Pick<
   | "hero_description"
   | "cv_headline"
   | "cv_summary"
+  | "cv_experiences"
+  | "cv_education"
+  | "cv_project_keys"
   | "soft_skills"
   | "languages"
 >;

@@ -93,6 +93,17 @@ AUTH_SECRET=at-least-32-random-characters
 
 When `DATABASE_URL` is absent, public routes deliberately use the checked-in fallback content so CI and a first build remain usable. Admin routes stay disabled until all auth variables are present.
 
+For an existing Neon database created before the content-model update, run
+`db/migrations/20261112_content_model.sql` once before deploying the new build. The
+migration adds stable project keys, case-study fields, and editable CV contact/content
+without deleting existing rows.
+
+With `DATABASE_URL` available locally, the same migration can be applied with:
+
+```bash
+npm run db:migrate:neon
+```
+
 ## Admin dashboard
 
 The dashboard is available at `/admin/login`.
@@ -104,7 +115,7 @@ The dashboard is available at `/admin/login`.
 | Profile | Identitas, bio, hero, kontak, dan konten CV |
 | Settings | Menyembunyikan/menampilkan fitur situs |
 
-The login account is the single `ADMIN_EMAIL` configured in Vercel. There is no public database API and no browser-side database client. The admin session is an HttpOnly, SameSite cookie signed with `AUTH_SECRET`; the server validates it again inside `requireAdmin()` and every Server Action.
+The login account is the single `ADMIN_EMAIL` configured in Vercel. There is no public database API and no browser-side database client. The admin session is an HttpOnly, SameSite cookie signed with `AUTH_SECRET`; the server validates it again inside `requireAdmin()` and every Server Action. Login attempts also receive a best-effort per-instance throttle; keep a platform WAF/rate limit enabled for durable protection across serverless instances.
 
 ## Migrating from Supabase
 
@@ -146,8 +157,11 @@ Vercel Postgres is not used here: Vercel's own documentation states that the pro
 
 ```bash
 npm test
+npm run typecheck
 npm run lint
+npm run audit
 npm run build
+npm run test:smoke
 ```
 
 ## License

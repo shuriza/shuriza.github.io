@@ -1,14 +1,25 @@
 import { boolean, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import type { CvEducation, CvExperience } from "@/lib/profile";
 
 export type StoredLanguage = { name: string; level: string };
 
 export const projects = pgTable("projects", {
   id: uuid("id").primaryKey().defaultRandom(),
+  catalog_key: text("catalog_key"),
   title: text("title").notNull(),
   description: text("description").notNull(),
   tech: text("tech").array().notNull().default([]),
   github: text("github"),
   demo: text("demo"),
+  slug: text("slug"),
+  status: text("status"),
+  category: text("category"),
+  role: text("role"),
+  problem: text("problem"),
+  features: text("features").array().notNull().default([]),
+  limitations: text("limitations"),
+  video: text("video"),
+  screenshots: text("screenshots").array().notNull().default([]),
   featured: boolean("featured").notNull().default(false),
   published: boolean("published").notNull().default(true),
   sort_order: integer("sort_order").notNull().default(0),
@@ -40,6 +51,7 @@ export const profile = pgTable("profile", {
   education: text("education").notNull(),
   status: text("status").notNull(),
   email: text("email").notNull(),
+  phone: text("phone").notNull().default(""),
   github: text("github").notNull(),
   linkedin: text("linkedin").notNull(),
   website: text("website").notNull(),
@@ -47,6 +59,9 @@ export const profile = pgTable("profile", {
   hero_description: text("hero_description").notNull(),
   cv_headline: text("cv_headline").notNull().default(""),
   cv_summary: text("cv_summary").notNull().default(""),
+  cv_experiences: jsonb("cv_experiences").$type<CvExperience[]>().notNull().default([]),
+  cv_education: jsonb("cv_education").$type<CvEducation[]>().notNull().default([]),
+  cv_project_keys: text("cv_project_keys").array().notNull().default([]),
   soft_skills: text("soft_skills").array().notNull().default([]),
   languages: jsonb("languages").$type<StoredLanguage[]>().notNull().default([]),
   updated_at: timestamp("updated_at", { withTimezone: true, mode: "date" }).notNull().defaultNow(),

@@ -17,6 +17,7 @@ const contentSecurityPolicy = [
 
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   experimental: {
     // Admin forms contain text-only profile data; larger action bodies are never required.
     serverActions: { bodySizeLimit: "256kb" },

@@ -18,6 +18,7 @@ const filters: Array<{ value: ProjectFilter; label: string }> = [
   { value: "all", label: "Semua" },
   { value: "live", label: "Live" },
   { value: "hosted", label: "Hosted" },
+  { value: "video", label: "Video" },
   { value: "case-study", label: "Case study" },
   { value: "private", label: "Private" },
   { value: "laravel", label: "Laravel" },
@@ -101,6 +102,17 @@ function ProjectCard({ project, compact = false }: { project: Project; compact?:
             >
               <FaExternalLinkAlt aria-hidden="true" size={13} />
               Demo
+            </a>
+          )}
+          {project.video && (
+            <a
+              href={project.video}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Buka video demo ${project.title}`}
+              className="inline-flex items-center gap-2 text-sm text-slate-300 transition-colors hover:text-cyan-300"
+            >
+              Video
             </a>
           )}
           {project.github && (

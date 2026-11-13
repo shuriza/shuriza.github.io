@@ -2,8 +2,9 @@ begin;
 
 insert into public.profile (
   id, display_name, short_name, role, bio_primary, bio_secondary, location,
-  focus, education, status, email, github, linkedin, website, hero_roles,
-  hero_description, cv_headline, cv_summary, soft_skills, languages
+  focus, education, status, email, phone, github, linkedin, website, hero_roles,
+  hero_description, cv_headline, cv_summary, cv_experiences, cv_education,
+  cv_project_keys, soft_skills, languages
 )
 values (
   1,
@@ -17,6 +18,7 @@ values (
   'D3 Manajemen Informatika · IPK 3,63',
   'Terbuka untuk Magang',
   'firdausmfirdaus657@gmail.com',
+  '0817-7509-3906',
   'https://github.com/shuriza',
   'https://www.linkedin.com/in/m-firdaus-suryaningrat-73a471338/',
   'https://shuriza.tech',
@@ -24,6 +26,9 @@ values (
   'Junior web developer dengan pengalaman membangun aplikasi operasional, integrasi AI/API, workflow automation, dan laporan berbasis data.',
   'Junior Web Developer | AI Automation, Laravel',
   'Lulusan D3 Manajemen Informatika Politeknik Negeri Malang (IPK 3,63) dengan pengalaman membangun aplikasi web dan automasi berbasis Laravel, PHP, MySQL, serta integrasi AI/API. Dalam tim empat mahasiswa, mengembangkan sebagian besar alur sistem rekap absensi DPMPTSP, termasuk impor dan validasi Excel, dashboard analitik, laporan Excel/PDF, dan demo kepada pengguna. Membangun Todo AI dengan Gemini, Google Classroom, dan Telegram Bot; membangun Shuriza Store sebagai e-commerce produk digital dengan checkout guest, multi-gateway payment, sinkronisasi stok, serta otomasi bot WhatsApp dan Telegram. Sedang memperdalam AI agent, prompt design, pengujian respons, dan dokumentasi SOP.',
+  '[{"title":"Mahasiswa Magang - Pengembangan Aplikasi Web","company":"DPMPTSP Kota Kediri","location":"Kota Kediri, Jawa Timur","period":"Juni 2025 - Agustus 2025","bullets":["Mengembangkan sebagian besar alur sistem rekap absensi internal dalam tim beranggotakan empat mahasiswa, menggunakan Laravel 12 dan MySQL untuk mengelola data kehadiran pegawai.","Membangun alur impor dan validasi Excel, pengelolaan izin presensi, dashboard analitik per departemen, serta laporan bulanan dan tahunan dalam format Excel dan PDF.","Mendemonstrasikan sistem kepada karyawan dan pengguna pada tahap akhir pengembangan."]}]'::jsonb,
+  '[{"title":"D3 Manajemen Informatika","institution":"Politeknik Negeri Malang","period":"2023 - 2026 · IPK 3,63","description":"Fokus pada pengembangan perangkat lunak, basis data, analisis sistem, dan manajemen proyek."},{"title":"Rekayasa Perangkat Lunak (RPL)","institution":"SMKN 1 Kertosono","period":"2020 - 2023","description":"Mempelajari dasar pemrograman dan pengembangan perangkat lunak dengan Java."}]'::jsonb,
+  array['rekap-absensi-dpmptsp', 'todo-ai', 'shuriza-store'],
   array['Problem Solving', 'Kolaborasi Tim', 'Komunikasi', 'Manajemen Waktu'],
   '[{"name":"Bahasa Indonesia","level":"Native"},{"name":"English","level":"Basic"}]'::jsonb
 )
@@ -39,7 +44,7 @@ from (values
   ('00000000-0000-4000-8000-000000000007'::uuid, 'Luncur', 'Platform untuk mengunggah HTML atau ZIP, mengelola revisi, dan menerbitkan website statis tanpa menyiapkan VPS sendiri.', array['Laravel 13', 'PHP 8.3', 'React 19', 'Inertia', 'TypeScript', 'Vite']::text[], null::text, null::text, true, true, 0),
   ('00000000-0000-4000-8000-000000000008'::uuid, 'Gudang Scan', 'Aplikasi inventaris gudang berbasis barcode untuk Android dengan database SQLite offline dan alur stok atomik.', array['Laravel 13', 'Livewire 4', 'NativePHP Mobile', 'SQLite', 'Barcode Scanner']::text[], 'https://github.com/shuriza/gudang-scan', null::text, true, true, 1),
   ('00000000-0000-4000-8000-000000000006'::uuid, 'Focus Tracker', 'Ekstensi Chrome dan dashboard untuk memahami durasi browsing, mengatur kuota domain, dan mengurangi distraksi.', array['Next.js', 'TypeScript', 'Supabase', 'Chrome Extension MV3', 'Recharts']::text[], 'https://github.com/shuriza/focus-tracker', 'https://focus-tracker-one-wheat.vercel.app', true, true, 2),
-  ('00000000-0000-4000-8000-000000000001'::uuid, 'Todo AI', 'Aplikasi manajemen tugas dengan Matriks Eisenhower, Google Classroom, Gemini AI, Telegram Bot, kalender, dan laporan analitik.', array['Laravel 12', 'PHP', 'MySQL', 'Gemini API', 'Google Classroom API', 'Telegram Bot']::text[], 'https://github.com/shuriza/todos', 'https://todosxai.ninja/', true, true, 3),
+  ('00000000-0000-4000-8000-000000000001'::uuid, 'Todo AI', 'Aplikasi manajemen tugas dengan Matriks Eisenhower, Google Classroom, Gemini AI, Telegram Bot, kalender, dan laporan analitik.', array['Laravel 12', 'PHP', 'MySQL', 'Gemini API', 'Google Classroom API', 'Telegram Bot']::text[], 'https://github.com/shuriza/todos', null::text, true, true, 3),
   ('00000000-0000-4000-8000-000000000002'::uuid, 'Sistem Rekap Absensi DPMPTSP', 'Sistem Laravel untuk impor dan validasi absensi, pengelolaan izin, dashboard analitik, serta laporan Excel dan PDF.', array['Laravel 12', 'PHP', 'MySQL', 'Alpine.js', 'Laravel Excel', 'DomPDF']::text[], 'https://github.com/shuriza/rekap_absensi', null::text, true, true, 4),
   ('00000000-0000-4000-8000-000000000005'::uuid, 'CosplayNesia', 'Marketplace demo untuk penyewaan dan pembelian kostum cosplay dengan checkout transaksional dan fulfillment multi-penjual.', array['Laravel 13', 'PHP', 'PostgreSQL', 'Blade', 'JavaScript', 'Docker']::text[], 'https://github.com/shuriza/CosplayNesia', null::text, true, true, 5),
   ('00000000-0000-4000-8000-000000000009'::uuid, 'Akui HRIS', 'Sistem informasi SDM internal dengan rekrutmen, data karyawan, absensi, cuti, training, payroll, KPI, dan onboarding.', array['Laravel 13', 'PHP', 'Blade', 'Tailwind CSS', 'Alpine.js', 'Chart.js']::text[], null::text, null::text, false, true, 6),
@@ -87,5 +92,37 @@ from (values
 where not exists (
   select 1 from public.skills existing where existing.name = seed.name and existing.category = seed.category
 );
+
+update public.projects as project
+set
+  catalog_key = seed.catalog_key,
+  slug = seed.slug,
+  status = seed.status,
+  category = seed.category
+from (values
+  ('Luncur', 'luncur', 'luncur', 'case-study', 'laravel'),
+  ('Gudang Scan', 'gudang-scan', 'gudang-scan', 'case-study', 'mobile-desktop'),
+  ('Focus Tracker', 'focus-tracker', 'focus-tracker', 'live', 'web'),
+  ('Todo AI', 'todo-ai', 'todo-ai', 'case-study', 'ai-automation'),
+  ('Sistem Rekap Absensi DPMPTSP', 'rekap-absensi-dpmptsp', 'sistem-rekap-absensi-dpmptsp', 'case-study', 'laravel'),
+  ('CosplayNesia', 'cosplaynesia', 'cosplaynesia', 'case-study', 'laravel'),
+  ('Akui HRIS', 'akui-hris', 'akui-hris', 'private', 'case-study'),
+  ('Antrian Loket', 'antrian-loket', 'antrian-loket', 'case-study', 'mobile-desktop'),
+  ('Website Komunitas Desa Muneng', 'website-desa-muneng', 'website-komunitas-desa-muneng', 'private', 'web'),
+  ('Kandangan Fresh', 'kandangan-fresh', 'kandangan-fresh', 'case-study', 'laravel'),
+  ('Shuriza Store', 'shuriza-store', 'shuriza-store', 'live', 'laravel'),
+  ('Carte — Affiliate Content Studio', 'carte', 'carte-affiliate-content-studio', 'private', 'ai-automation'),
+  ('Front-end Lab', 'front-end-lab', 'front-end-lab', 'case-study', 'web'),
+  ('Web Anime', 'web-anime', 'web-anime', 'case-study', 'web'),
+  ('Shopee Seller Notifikasi', 'shopee-seller-notifikasi', 'shopee-seller-notifikasi', 'case-study', 'ai-automation'),
+  ('Sosmed Storefront', 'sosmed-storefront', 'sosmed-storefront', 'private', 'laravel'),
+  ('9Router', '9router', '9router', 'private', 'ai-automation'),
+  ('LMS Cerdas', 'lms-cerdas', 'lms-cerdas', 'private', 'laravel'),
+  ('Dashboard Visualisasi Data JKN', 'dashboard-jkn', 'dashboard-visualisasi-data-jkn', 'private', 'web'),
+  ('Arsip Surat', 'arsip-surat', 'arsip-surat', 'private', 'laravel'),
+  ('Tokoku', 'tokoku', 'tokoku', 'private', 'laravel'),
+  ('Aplikasi Mobile Polinema', 'polinema-mobile', 'aplikasi-mobile-polinema', 'private', 'mobile-desktop')
+) as seed(title, catalog_key, slug, status, category)
+where project.title = seed.title;
 
 commit;

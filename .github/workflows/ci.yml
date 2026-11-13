@@ -22,10 +22,19 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Test
         run: npm test
+
+      - name: Dependency audit
+        run: npm run audit
 
       # Supabase env is intentionally absent. The build must stay green without
       # it: public pages fall back to seed data when the credentials are missing.
       - name: Build
         run: npm run build
+
+      - name: Route smoke test
+        run: npm run test:smoke

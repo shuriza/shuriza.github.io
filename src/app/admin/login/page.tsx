@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { loginAdmin } from "@/app/admin/auth-actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export default async function AdminLoginPage({
   searchParams,
@@ -49,12 +50,9 @@ export default async function AdminLoginPage({
               />
             </label>
             {message && <p role="alert" className="text-sm text-red-400">{message}</p>}
-            <button
-              type="submit"
-              className="w-full rounded-lg bg-cyan-500 px-4 py-3 font-semibold text-[#0a0a0f] transition hover:bg-cyan-400"
-            >
-              Masuk
-            </button>
+            <div className="[&>button]:w-full [&>button]:px-4 [&>button]:py-3">
+              <SubmitButton>Masuk</SubmitButton>
+            </div>
           </form>
         </div>
       </div>

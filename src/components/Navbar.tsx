@@ -20,6 +20,7 @@ export default function Navbar({ settings = fallbackSettings }: { settings?: Sit
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
   const navLinks = NAV_ITEMS.filter((item) => item.flag === null || settings[item.flag]);
   const showAdminLink = settings.admin_link_enabled;
 
@@ -37,10 +38,28 @@ export default function Navbar({ settings = fallbackSettings }: { settings?: Sit
       if (event.key === "Escape") {
         setMobileOpen(false);
         menuButtonRef.current?.focus();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+      const focusable = Array.from(
+        mobileNavRef.current?.querySelectorAll<HTMLElement>("a, button") ?? [],
+      ).filter((element) => !element.hasAttribute("disabled"));
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
+    mobileNavRef.current?.querySelector<HTMLElement>("a, button")?.focus();
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [mobileOpen]);
 
@@ -90,7 +109,12 @@ export default function Navbar({ settings = fallbackSettings }: { settings?: Sit
       </div>
 
       {mobileOpen && (
-        <div id="mobile-navigation" className="border-b border-[#334155]/50 bg-[#0f172a]/95 backdrop-blur-md md:hidden">
+        <div
+          ref={mobileNavRef}
+          id="mobile-navigation"
+          aria-label="Menu navigasi mobile"
+          className="border-b border-[#334155]/50 bg-[#0f172a]/95 backdrop-blur-md md:hidden"
+        >
           <div className="flex flex-col gap-4 px-6 py-4">
             {navLinks.map((link) => (
               <a

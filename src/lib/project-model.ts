@@ -3,6 +3,8 @@ export type ProjectCategory = "web" | "laravel" | "mobile-desktop" | "ai-automat
 
 export interface Project {
   id: string;
+  /** Stable link to the curated catalog; remains stable when the title changes. */
+  catalog_key?: string;
   title: string;
   description: string;
   tech: string[];
@@ -37,3 +39,11 @@ export const PROJECT_CATEGORY_LABELS: Record<ProjectCategory, string> = {
   "ai-automation": "AI & Automation",
   "case-study": "Case Study",
 };
+
+export function isProjectStatus(value: unknown): value is ProjectStatus {
+  return value === "live" || value === "hosted" || value === "video" || value === "case-study" || value === "private";
+}
+
+export function isProjectCategory(value: unknown): value is ProjectCategory {
+  return value === "web" || value === "laravel" || value === "mobile-desktop" || value === "ai-automation" || value === "case-study";
+}

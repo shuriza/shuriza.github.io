@@ -1,4 +1,5 @@
 import { SKILL_CATEGORIES, SKILL_ICON_OPTIONS } from "@/lib/skills";
+import { isProjectCategory, isProjectStatus, type ProjectCategory, type ProjectStatus } from "@/lib/project-model";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,6 +36,34 @@ function readOptionalHttpsUrl(formData: FormData, field: string, label: string) 
   }
 
   return value;
+}
+
+function readOptionalText(formData: FormData, field: string, label: string, maxLength: number) {
+  const value = String(formData.get(field) ?? "").trim();
+  if (!value) return null;
+  if (value.length > maxLength) throw new AdminValidationError(`${label} terlalu panjang.`);
+  return value;
+}
+
+function readOptionalSlug(formData: FormData) {
+  const value = String(formData.get("slug") ?? "").trim().toLowerCase();
+  if (!value) return null;
+  if (value.length > 120 || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)) {
+    throw new AdminValidationError("Slug harus berupa huruf kecil, angka, dan tanda hubung.");
+  }
+  return value;
+}
+
+function readScreenshotPaths(formData: FormData) {
+  const raw = String(formData.get("screenshots") ?? "").trim();
+  if (!raw) return [];
+  if (raw.length > 6000) throw new AdminValidationError("Screenshot terlalu panjang.");
+
+  const values = raw.split("\n").map((value) => value.trim()).filter(Boolean);
+  if (values.length > 12 || values.some((value) => value.length > 500 || !/^\/[A-Za-z0-9][A-Za-z0-9_./-]*$/.test(value))) {
+    throw new AdminValidationError("Screenshot harus berupa path lokal /public, maksimal 12 item.");
+  }
+  return values;
 }
 
 function readSortOrder(formData: FormData) {
@@ -85,12 +114,28 @@ export function readProjectInput(formData: FormData) {
     throw new AdminValidationError("Teknologi maksimal 20 item dan 60 karakter per item.");
   }
 
+  const status = String(formData.get("status") ?? "case-study");
+  const category = String(formData.get("category") ?? "case-study");
+  if (!isProjectStatus(status)) throw new AdminValidationError("Status project tidak valid.");
+  if (!isProjectCategory(category)) throw new AdminValidationError("Kategori project tidak valid.");
+  const video = readOptionalHttpsUrl(formData, "video", "Video URL");
+  if (status === "video" && !video) throw new AdminValidationError("Status Video Demo membutuhkan Video URL.");
+
   return {
     title: readBoundedText(formData, "title", "Nama project", 120),
     description: readBoundedText(formData, "description", "Description", 1000),
     tech,
     github: readOptionalHttpsUrl(formData, "github", "GitHub URL"),
     demo: readOptionalHttpsUrl(formData, "demo", "Demo URL"),
+    slug: readOptionalSlug(formData),
+    status: status as ProjectStatus,
+    category: category as ProjectCategory,
+    role: readOptionalText(formData, "role", "Peran", 200),
+    problem: readOptionalText(formData, "problem", "Masalah", 1500),
+    features: readLines(formData, "features", "Fitur", 12, 220),
+    limitations: readOptionalText(formData, "limitations", "Batasan", 1200),
+    video,
+    screenshots: readScreenshotPaths(formData),
     featured: formData.get("featured") === "on",
     published: formData.get("published") === "on",
     sort_order: readSortOrder(formData),
@@ -130,6 +175,7 @@ export function readProfileInput(formData: FormData) {
     education: 200,
     status: 120,
     email: 254,
+    phone: 40,
     github: 2048,
     linkedin: 2048,
     website: 2048,
@@ -167,5 +213,54 @@ export function readProfileInput(formData: FormData) {
     return { name, level };
   });
 
-  return { ...profile, hero_roles: heroRoles, soft_skills: softSkills, languages };
+  const experienceRaw = String(formData.get("cv_experiences") ?? "").trim();
+  if (experienceRaw.length > 12_000) throw new AdminValidationError("Pengalaman CV terlalu panjang.");
+  const cvExperiences = experienceRaw
+    ? experienceRaw.split(/\r?\n\s*\r?\n/).map((block) => {
+        const lines = block.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+        const header = lines.shift()?.split("|").map((part) => part.trim()) ?? [];
+        const [title, company, location, period] = header;
+        const bullets = lines.map((line) => line.replace(/^[-*]\s*/, "").trim()).filter(Boolean);
+        if (!title || !company || !period || !bullets.length || header.length !== 4) {
+          throw new AdminValidationError("Pengalaman CV harus memakai format header: Jabatan | Perusahaan | Lokasi | Periode, lalu bullet per baris.");
+        }
+        if ([title, company, location, period].some((value) => value.length > 180) || bullets.some((bullet) => bullet.length > 500)) {
+          throw new AdminValidationError("Data pengalaman CV terlalu panjang.");
+        }
+        return { title, company, location, period, bullets };
+      })
+    : [];
+
+  const educationRaw = String(formData.get("cv_education") ?? "").trim();
+  if (educationRaw.length > 6000) throw new AdminValidationError("Pendidikan CV terlalu panjang.");
+  const cvEducation = educationRaw
+    ? educationRaw.split(/\r?\n\s*\r?\n/).map((block) => {
+        const lines = block.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+        const header = lines.shift()?.split("|").map((part) => part.trim()) ?? [];
+        const [title, institution, period] = header;
+        const description = lines.join(" ");
+        if (!title || !institution || !period || header.length !== 3) {
+          throw new AdminValidationError("Pendidikan CV harus memakai format: Pendidikan | Institusi | Periode, lalu deskripsi opsional.");
+        }
+        if ([title, institution, period, description].some((value) => value.length > 240)) {
+          throw new AdminValidationError("Data pendidikan CV terlalu panjang.");
+        }
+        return { title, institution, period, description };
+      })
+    : [];
+
+  const cvProjectKeys = readLines(formData, "cv_project_keys", "Project CV", 12, 120);
+  if (cvProjectKeys.some((key) => !/^[A-Za-z0-9][A-Za-z0-9_-]*$/.test(key))) {
+    throw new AdminValidationError("Project CV harus memakai catalog key atau slug yang valid.");
+  }
+
+  return {
+    ...profile,
+    hero_roles: heroRoles,
+    soft_skills: softSkills,
+    languages,
+    cv_experiences: cvExperiences,
+    cv_education: cvEducation,
+    cv_project_keys: [...new Set(cvProjectKeys)],
+  };
 }

@@ -4,6 +4,7 @@ import { deleteProject } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
 import { getAdminProjects } from "@/lib/db/queries";
 import type { Project } from "@/lib/projects";
+import DeleteButton from "@/components/DeleteButton";
 
 export default async function AdminProjectsPage() {
   const { user } = await requireAdmin();
@@ -51,7 +52,7 @@ export default async function AdminProjectsPage() {
                   <Link href={`/admin/projects/${project.id}/edit`} className="text-cyan-400 hover:text-cyan-300">Edit</Link>
                   <form action={deleteProject}>
                     <input type="hidden" name="id" value={project.id} />
-                    <button className="text-red-400 hover:text-red-300">Hapus</button>
+                    <DeleteButton />
                   </form>
                 </div>
               </div>

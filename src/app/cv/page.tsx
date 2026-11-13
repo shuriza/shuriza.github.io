@@ -15,8 +15,6 @@ import { getPublishedSkills } from "@/lib/skills-server";
 import { getSiteSettings } from "@/lib/settings-server";
 import { certifications } from "@/lib/certificates";
 
-const PHONE_NUMBER = "0817-7509-3906";
-
 export async function generateMetadata(): Promise<Metadata> {
   const [profile, settings] = await Promise.all([getProfile(), getSiteSettings()]);
   const title = `CV | ${profile.display_name}`;
@@ -63,6 +61,11 @@ function stripProtocol(url: string) {
   return url.replace(/^https?:\/\//i, "").replace(/\/$/, "");
 }
 
+function phoneHref(phone: string) {
+  const normalized = phone.replace(/[^\d+]/g, "");
+  return normalized ? `tel:${normalized}` : null;
+}
+
 export default async function CVPage() {
   const settings = await getSiteSettings();
   if (!settings.cv_enabled) notFound();
@@ -77,17 +80,13 @@ export default async function CVPage() {
     title: category,
     items: skills.filter((skill) => skill.category === category),
   })).filter((group) => group.items.length > 0);
-  const cvProjectOrder: Record<string, number> = {
-    "Sistem Rekap Absensi DPMPTSP": 0,
-    "Todo AI": 1,
-    "Shuriza Store": 2,
-  };
+  const cvProjectOrder = new Map(profile.cv_project_keys.map((key, index) => [key, index]));
   const cvProjects = projects
-    .filter((project) => cvProjectOrder[project.title] !== undefined)
+    .filter((project) => cvProjectOrder.has(project.catalog_key ?? project.slug ?? project.id))
     .sort(
       (first, second) =>
-        (cvProjectOrder[first.title] ?? Number.MAX_SAFE_INTEGER) -
-        (cvProjectOrder[second.title] ?? Number.MAX_SAFE_INTEGER),
+        (cvProjectOrder.get(first.catalog_key ?? first.slug ?? first.id) ?? Number.MAX_SAFE_INTEGER) -
+        (cvProjectOrder.get(second.catalog_key ?? second.slug ?? second.id) ?? Number.MAX_SAFE_INTEGER),
     );
 
   return (
@@ -116,65 +115,43 @@ export default async function CVPage() {
           </p>
         </Section>
 
-        <Section title="Pengalaman">
-          <div className="cv-item">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-              <h3 className="text-base font-semibold text-white">
-                Mahasiswa Magang - Pengembangan Aplikasi Web
-              </h3>
-              <span className="text-xs text-slate-400">Juni 2025 - Agustus 2025</span>
+        {profile.cv_experiences.length > 0 && (
+          <Section title="Pengalaman">
+            <div className="space-y-5">
+              {profile.cv_experiences.map((experience) => (
+                <div key={`${experience.title}-${experience.company}-${experience.period}`} className="cv-item">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                    <h3 className="text-base font-semibold text-white">{experience.title}</h3>
+                    <span className="text-xs text-slate-400">{experience.period}</span>
+                  </div>
+                  <p className="mt-1 text-sm font-medium text-cyan-400">
+                    {experience.company}{experience.location && ` · ${experience.location}`}
+                  </p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-300">
+                    {experience.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                </div>
+              ))}
             </div>
-            <p className="mt-1 text-sm font-medium text-cyan-400">
-              DPMPTSP Kota Kediri · Kota Kediri, Jawa Timur
-            </p>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-300">
-              <li>
-                Mengembangkan sebagian besar alur sistem rekap absensi internal dalam tim
-                beranggotakan empat mahasiswa, menggunakan Laravel 12 dan MySQL untuk
-                mengelola data kehadiran pegawai DPMPTSP Kota Kediri.
-              </li>
-              <li>
-                Membangun alur impor dan validasi Excel, pengelolaan izin presensi,
-                dashboard analitik per departemen, serta laporan bulanan dan tahunan
-                dalam format Excel dan PDF.
-              </li>
-              <li>
-                Mendemonstrasikan sistem kepada karyawan dan pengguna DPMPTSP pada tahap
-                akhir pengembangan.
-              </li>
-            </ul>
-          </div>
-        </Section>
+          </Section>
+        )}
 
-        <Section title="Pendidikan">
-          <div className="space-y-5">
-            <div className="cv-item">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                <h3 className="text-base font-semibold text-white">
-                  D3 Manajemen Informatika
-                </h3>
-                <span className="text-xs text-slate-400">2023 - 2026 · IPK 3,63</span>
-              </div>
-              <p className="mt-1 text-sm text-cyan-400">Politeknik Negeri Malang</p>
-              <p className="mt-1 text-sm leading-relaxed text-slate-300">
-                Fokus pada pengembangan perangkat lunak, basis data, analisis sistem,
-                dan manajemen proyek.
-              </p>
+        {profile.cv_education.length > 0 && (
+          <Section title="Pendidikan">
+            <div className="space-y-5">
+              {profile.cv_education.map((education) => (
+                <div key={`${education.title}-${education.institution}-${education.period}`} className="cv-item">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                    <h3 className="text-base font-semibold text-white">{education.title}</h3>
+                    <span className="text-xs text-slate-400">{education.period}</span>
+                  </div>
+                  <p className="mt-1 text-sm text-cyan-400">{education.institution}</p>
+                  {education.description && <p className="mt-1 text-sm leading-relaxed text-slate-300">{education.description}</p>}
+                </div>
+              ))}
             </div>
-            <div className="cv-item">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                <h3 className="text-base font-semibold text-white">
-                  Rekayasa Perangkat Lunak (RPL)
-                </h3>
-                <span className="text-xs text-slate-400">2020 - 2023</span>
-              </div>
-              <p className="mt-1 text-sm text-cyan-400">SMKN 1 Kertosono</p>
-              <p className="mt-1 text-sm leading-relaxed text-slate-300">
-                Mempelajari dasar pemrograman dan pengembangan perangkat lunak dengan Java.
-              </p>
-            </div>
-          </div>
-        </Section>
+          </Section>
+        )}
 
         {skillGroups.length > 0 && (
           <Section title="Keahlian Teknis">
@@ -228,7 +205,18 @@ export default async function CVPage() {
                           Live Demo
                         </a>
                       )}
-                      {!project.github && !project.demo && (
+                      {project.video && (
+                        <a
+                          href={project.video}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Buka video demo ${project.title} di tab baru`}
+                          className="hover:underline"
+                        >
+                          Video
+                        </a>
+                      )}
+                      {!project.github && !project.demo && !project.video && (
                         <span className="text-slate-500">Private case study</span>
                       )}
                     </div>
@@ -236,6 +224,7 @@ export default async function CVPage() {
                   <div className="print-url" aria-hidden="true">
                     {project.github && <span>GitHub: {project.github}</span>}
                     {project.demo && <span>Demo: {project.demo}</span>}
+                    {project.video && <span>Video: {project.video}</span>}
                   </div>
                   <p className="text-sm text-slate-300 mt-1 leading-relaxed">
                     {project.description}
@@ -310,6 +299,8 @@ export default async function CVPage() {
 }
 
 function CvHeader({ profile }: { profile: Profile }) {
+  const phoneUrl = phoneHref(profile.phone);
+
   return (
     <header className="cv-header flex flex-col sm:flex-row items-start sm:items-center gap-6 pb-8 border-b border-[#334155]">
       <div className="cv-avatar shrink-0 w-20 h-20 rounded-full bg-cyan-500 flex items-center justify-center text-2xl font-bold text-[#0a0a0f]">
@@ -332,13 +323,15 @@ function CvHeader({ profile }: { profile: Profile }) {
             <HiOutlineLocationMarker size={15} />
             <span>{profile.location}</span>
           </span>
-          <a
-            href="tel:+6281775093906"
-            className="inline-flex min-w-0 items-center gap-1.5 hover:text-cyan-400 transition-colors"
-          >
-            <HiOutlinePhone size={15} />
-            <span>{PHONE_NUMBER}</span>
-          </a>
+          {phoneUrl && (
+            <a
+              href={phoneUrl}
+              className="inline-flex min-w-0 items-center gap-1.5 hover:text-cyan-400 transition-colors"
+            >
+              <HiOutlinePhone size={15} />
+              <span>{profile.phone}</span>
+            </a>
+          )}
           <a
             href={profile.github}
             target="_blank"

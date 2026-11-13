@@ -4,6 +4,7 @@ import { deleteSkill } from "@/app/admin/actions";
 import { requireAdmin } from "@/lib/admin";
 import { getAdminSkills } from "@/lib/db/queries";
 import { SKILL_ICON_OPTIONS, type Skill } from "@/lib/skills";
+import DeleteButton from "@/components/DeleteButton";
 
 export default async function AdminSkillsPage() {
   const { user } = await requireAdmin();
@@ -32,7 +33,7 @@ export default async function AdminSkillsPage() {
               <div className="flex items-center gap-3"><Icon size={22} style={{ color: skill.color }} /><div><h2 className="font-semibold text-white">{skill.name}</h2><p className="text-xs text-slate-500">{skill.icon}</p></div></div>
               <span className="text-sm text-cyan-400">{skill.category}</span>
               <span className={skill.published ? "text-sm text-emerald-400" : "text-sm text-slate-500"}>{skill.published ? "Published" : "Draft"}</span>
-              <div className="flex items-center gap-3 text-sm"><Link href={`/admin/skills/${skill.id}/edit`} className="text-cyan-400 hover:text-cyan-300">Edit</Link><form action={deleteSkill}><input type="hidden" name="id" value={skill.id} /><button className="text-red-400 hover:text-red-300">Hapus</button></form></div>
+              <div className="flex items-center gap-3 text-sm"><Link href={`/admin/skills/${skill.id}/edit`} className="text-cyan-400 hover:text-cyan-300">Edit</Link><form action={deleteSkill}><input type="hidden" name="id" value={skill.id} /><DeleteButton /></form></div>
             </div>;
           })}
         </div>
